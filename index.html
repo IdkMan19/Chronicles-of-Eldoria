@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chronicles of Eldoria - 3D Medieval RPG</title>
-    <!-- Tailwind CSS for modern HUD layout -->
+    <title>Shadowglass: Chronicles of Eldoria</title>
+    <!-- Tailwind CSS for UI Layout -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Three.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Google Font for Medieval RPG Aesthetic -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Medieval Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=VT323&display=swap" rel="stylesheet">
     <style>
         * {
             user-select: none;
@@ -22,254 +22,212 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            font-family: 'Inter', sans-serif;
-            background-color: #0d0f12;
+            background-color: #050508;
             color: #e2e8f0;
+            font-family: 'VT323', monospace;
         }
         .font-cinzel {
             font-family: 'Cinzel', serif;
         }
-        canvas {
+        .font-retro {
+            font-family: 'VT323', monospace;
+        }
+
+        /* CRISP NEAREST-NEIGHBOR PIXELATED RENDERING (Project Shadowglass Style) */
+        canvas#game-canvas {
             display: block;
             width: 100vw;
             height: 100vh;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            image-rendering: -moz-crisp-edges;
         }
-        /* Custom UI Glassmorphism & Medieval Borders */
-        .rpg-panel {
-            background: rgba(18, 16, 23, 0.78);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(212, 175, 55, 0.1);
-            border-radius: 0.75rem;
+
+        /* Custom Retro Medieval Glassmorphism HUD */
+        .retro-panel {
+            background: rgba(12, 10, 18, 0.88);
+            border: 2px solid #a37c3f;
+            box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.2), 0 4px 20px rgba(0, 0, 0, 0.8);
+            border-radius: 4px;
         }
-        .rpg-button {
-            background: linear-gradient(135deg, #2a2015 0%, #4a3820 100%);
-            border: 1px solid #d4af37;
+        .retro-button {
+            background: linear-gradient(180deg, #4a3820 0%, #20170b 100%);
+            border: 2px solid #d4af37;
             color: #f3e5ab;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-            transition: all 0.2s ease;
+            text-shadow: 1px 1px 0px #000;
+            transition: all 0.1s ease;
         }
-        .rpg-button:hover {
-            background: linear-gradient(135deg, #3d2f1d 0%, #634b2b 100%);
-            box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
-            transform: translateY(-1px);
+        .retro-button:hover {
+            background: linear-gradient(180deg, #634b2b 0%, #3a2a14 100%);
+            border-color: #fff;
         }
-        .rpg-button:active {
+        .retro-button:active {
             transform: translateY(1px);
         }
+
         /* Crosshair */
         #crosshair {
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 10px;
-            height: 10px;
+            width: 12px;
+            height: 12px;
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
         #crosshair::before, #crosshair::after {
             content: '';
             position: absolute;
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 235, 180, 0.8);
+            box-shadow: 0 0 2px #000;
         }
-        #crosshair::before { top: 4px; left: -8px; width: 26px; height: 2px; }
-        #crosshair::after { top: -8px; left: 4px; width: 2px; height: 26px; }
+        #crosshair::before { top: 5px; left: -6px; width: 24px; height: 2px; }
+        #crosshair::after { top: -6px; left: 5px; width: 2px; height: 24px; }
 
-        /* Sound Indicator Wave */
-        .audio-pulse {
-            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-        }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
+        /* CRT Vignette Scanline overlay */
+        .crt-overlay {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 3px, 6px 100%;
+            pointer-events: none;
         }
     </style>
 </head>
 <body class="relative min-h-screen w-full select-none overflow-hidden">
 
-    <!-- Game Canvas Target -->
+    <!-- Primary Canvas Container -->
     <div id="canvas-container" class="absolute inset-0 w-full h-full"></div>
 
-    <!-- Dynamic Crosshair -->
-    <div id="crosshair" class="z-20 opacity-60"></div>
+    <!-- Retro CRT & Vignette Visual Overlay -->
+    <div class="crt-overlay absolute inset-0 z-10 pointer-events-none"></div>
 
-    <!-- HUD Overlay -->
-    <div id="hud" class="absolute inset-0 pointer-events-none z-10 flex flex-col justify-between p-4 md:p-6">
-        <!-- Top Bar (Player Stats & Minimap) -->
+    <!-- FPS Crosshair -->
+    <div id="crosshair" class="z-20"></div>
+
+    <!-- Retro HUD Overlay -->
+    <div id="hud" class="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-3 md:p-5">
+        <!-- Top Stats Row -->
         <div class="flex justify-between items-start w-full gap-4">
-            <!-- Health & Stamina Stats -->
-            <div class="rpg-panel p-4 min-w-[240px] md:min-w-[280px] pointer-events-auto">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="font-cinzel text-amber-400 font-bold tracking-wider text-sm">SIR ELYON</span>
-                    <span id="level-indicator" class="text-xs bg-amber-900/60 text-amber-200 border border-amber-600/50 px-2 py-0.5 rounded font-mono">LVL 1</span>
+            <!-- Health & Stamina Panel -->
+            <div class="retro-panel p-3 min-w-[220px] md:min-w-[260px] pointer-events-auto">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="font-cinzel text-amber-400 font-bold text-xs tracking-wider">SIR ELYON</span>
+                    <span id="level-indicator" class="text-xs text-amber-300 font-mono">LVL 1 PALADIN</span>
                 </div>
                 <!-- HP Bar -->
-                <div class="mb-2">
-                    <div class="flex justify-between text-xs mb-1 font-semibold text-rose-300">
+                <div class="mb-1.5">
+                    <div class="flex justify-between text-xs mb-0.5 text-rose-300 font-bold">
                         <span>HEALTH</span>
                         <span id="hp-text">100 / 100</span>
                     </div>
-                    <div class="w-full bg-slate-900/80 rounded-full h-3 border border-rose-900/50 overflow-hidden p-0.5">
-                        <div id="hp-bar" class="bg-gradient-to-r from-red-700 to-rose-500 h-full rounded-full transition-all duration-200" style="width: 100%;"></div>
+                    <div class="w-full bg-slate-950 rounded-none h-3 border border-rose-900 overflow-hidden p-0.5">
+                        <div id="hp-bar" class="bg-rose-600 h-full transition-all duration-150" style="width: 100%;"></div>
                     </div>
                 </div>
                 <!-- Stamina Bar -->
                 <div>
-                    <div class="flex justify-between text-xs mb-1 font-semibold text-emerald-300">
+                    <div class="flex justify-between text-xs mb-0.5 text-emerald-300 font-bold">
                         <span>STAMINA</span>
                         <span id="stamina-text">100 / 100</span>
                     </div>
-                    <div class="w-full bg-slate-900/80 rounded-full h-2.5 border border-emerald-900/50 overflow-hidden p-0.5">
-                        <div id="stamina-bar" class="bg-gradient-to-r from-emerald-700 to-teal-400 h-full rounded-full transition-all duration-100" style="width: 100%;"></div>
+                    <div class="w-full bg-slate-950 rounded-none h-2 border border-emerald-900 overflow-hidden p-0.5">
+                        <div id="stamina-bar" class="bg-emerald-500 h-full transition-all duration-100" style="width: 100%;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Active Quest & Gold Tracker -->
-            <div class="flex flex-col items-end gap-3">
-                <!-- Gold & Relics Counter -->
-                <div class="rpg-panel px-4 py-2 flex items-center gap-4 pointer-events-auto">
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-xl">🪙</span>
-                        <span id="gold-count" class="font-bold text-amber-300 font-mono text-base">0</span>
+            <!-- Quest & Currency Tracker -->
+            <div class="flex flex-col items-end gap-2">
+                <!-- Counter Badges -->
+                <div class="retro-panel px-3 py-1.5 flex items-center gap-3 pointer-events-auto">
+                    <div class="flex items-center gap-1">
+                        <span class="text-sm">🪙</span>
+                        <span id="gold-count" class="font-bold text-amber-300 text-lg">0</span>
                     </div>
-                    <div class="h-4 w-[1px] bg-amber-500/30"></div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-xl">🔮</span>
-                        <span id="relic-count" class="font-bold text-cyan-300 font-mono text-base">0 / 5</span>
+                    <div class="h-4 w-[1px] bg-amber-600/40"></div>
+                    <div class="flex items-center gap-1">
+                        <span class="text-sm">🔮</span>
+                        <span id="relic-count" class="font-bold text-cyan-300 text-lg">0 / 5</span>
                     </div>
                 </div>
 
                 <!-- Quest Tracker Container -->
-                <div class="rpg-panel p-3.5 max-w-xs text-right pointer-events-auto">
-                    <h3 class="font-cinzel text-xs font-bold text-amber-400 uppercase tracking-widest border-b border-amber-500/20 pb-1 mb-2">Active Quest</h3>
-                    <p id="quest-title" class="text-sm font-semibold text-amber-100">Speak to Elder Bran</p>
-                    <p id="quest-desc" class="text-xs text-slate-300 mt-1 leading-relaxed">Find Elder Bran near the village bonfire for instructions.</p>
+                <div class="retro-panel p-3 max-w-xs text-right pointer-events-auto">
+                    <h3 class="font-cinzel text-xs font-bold text-amber-400 uppercase tracking-widest border-b border-amber-600/40 pb-0.5 mb-1">Active Quest</h3>
+                    <p id="quest-title" class="text-base font-bold text-amber-100">Speak to Elder Bran</p>
+                    <p id="quest-desc" class="text-xs text-slate-300 leading-tight">Locate Elder Bran near the village central bonfire.</p>
                 </div>
 
-                <!-- Sound / Inventory Control Buttons -->
+                <!-- Audio Toggle & Controls -->
                 <div class="flex gap-2 pointer-events-auto">
-                    <button id="btn-inventory" class="rpg-button p-2 rounded-lg text-xs font-bold flex items-center gap-1">
-                        <span>🎒</span> <span class="hidden sm:inline">BAG</span>
-                    </button>
-                    <button id="btn-audio" class="rpg-button p-2 rounded-lg text-xs font-bold flex items-center gap-1">
-                        <span id="audio-icon">🔊</span>
+                    <button id="btn-audio" class="retro-button px-2 py-1 text-xs font-bold">
+                        <span id="audio-icon">🔊</span> AUDIO
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Center Interaction Prompt -->
-        <div id="interaction-prompt" class="self-center hidden transition-all duration-200 transform translate-y-2">
-            <div class="rpg-panel px-6 py-2.5 flex items-center gap-3 border-amber-400 animate-bounce">
-                <span id="interact-key" class="bg-amber-500 text-slate-950 font-extrabold px-2 py-0.5 rounded text-xs">E</span>
-                <span id="interact-text" class="font-cinzel text-sm text-amber-200 font-bold tracking-wide">Talk to Elder</span>
+        <!-- Middle Interaction Prompt -->
+        <div id="interaction-prompt" class="self-center hidden transition-all">
+            <div class="retro-panel px-5 py-2 flex items-center gap-2 border-amber-400 animate-pulse">
+                <span id="interact-key" class="bg-amber-500 text-slate-950 font-black px-1.5 py-0.5 rounded text-xs">E</span>
+                <span id="interact-text" class="font-cinzel text-sm text-amber-200 font-bold">Talk to NPC</span>
             </div>
         </div>
 
-        <!-- Bottom Bar (Controls & Minimap Canvas) -->
+        <!-- Bottom Controls Bar -->
         <div class="flex justify-between items-end w-full">
-            <!-- Keyboard Quick Reference -->
-            <div class="hidden md:flex rpg-panel p-3 gap-3 text-xs text-slate-300 pointer-events-auto border-amber-500/20">
-                <div><span class="bg-slate-800 border border-slate-600 px-1.5 py-0.5 rounded text-amber-300 font-mono">WASD</span> Move</div>
-                <div><span class="bg-slate-800 border border-slate-600 px-1.5 py-0.5 rounded text-amber-300 font-mono">SHIFT</span> Sprint</div>
-                <div><span class="bg-slate-800 border border-slate-600 px-1.5 py-0.5 rounded text-amber-300 font-mono">SPACE</span> Jump</div>
-                <div><span class="bg-slate-800 border border-slate-600 px-1.5 py-0.5 rounded text-amber-300 font-mono">L-CLICK</span> Attack</div>
-                <div><span class="bg-slate-800 border border-slate-600 px-1.5 py-0.5 rounded text-amber-300 font-mono">E</span> Interact</div>
-            </div>
-
-            <!-- Mobile Controls Overlay (Visible only on touch devices) -->
-            <div id="mobile-controls" class="flex md:hidden gap-4 pointer-events-auto">
-                <div id="joystick-zone" class="w-24 h-24 bg-slate-900/60 rounded-full border border-amber-500/30 relative flex items-center justify-center">
-                    <div id="joystick-knob" class="w-10 h-10 bg-amber-500/80 rounded-full absolute"></div>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <button id="mobile-attack" class="rpg-button w-12 h-12 rounded-full text-lg flex items-center justify-center">⚔️</button>
-                    <button id="mobile-jump" class="rpg-button w-12 h-12 rounded-full text-xs font-bold flex items-center justify-center">JUMP</button>
-                </div>
+            <div class="hidden md:flex retro-panel p-2 gap-3 text-xs text-slate-300 pointer-events-auto">
+                <div><span class="text-amber-400 font-bold">WASD</span> Move</div>
+                <div><span class="text-amber-400 font-bold">SHIFT</span> Sprint</div>
+                <div><span class="text-amber-400 font-bold">SPACE</span> Jump</div>
+                <div><span class="text-amber-400 font-bold">L-CLICK</span> Attack</div>
+                <div><span class="text-amber-400 font-bold">R-CLICK</span> Block / Parry</div>
+                <div><span class="text-amber-400 font-bold">E</span> Interact</div>
             </div>
         </div>
     </div>
 
-    <!-- Start Screen Overlay -->
-    <div id="start-overlay" class="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-6">
-        <div class="rpg-panel max-w-lg w-full p-8 text-center border-amber-500/50 shadow-2xl relative overflow-hidden">
-            <div class="absolute -top-12 -left-12 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
-            <h1 class="font-cinzel text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-600 mb-2">CHRONICLES OF ELDORIA</h1>
-            <p class="text-xs font-cinzel tracking-widest text-amber-500 uppercase mb-6">3D Medieval Kingdom Exploration</p>
+    <!-- Start Overlay Screen -->
+    <div id="start-overlay" class="absolute inset-0 z-50 flex items-center justify-center bg-black/90 p-4">
+        <div class="retro-panel max-w-lg w-full p-6 text-center border-amber-500 relative">
+            <h1 class="font-cinzel text-3xl md:text-4xl font-black text-amber-400 tracking-wider mb-1">SHADOWGLASS</h1>
+            <p class="text-sm font-retro text-amber-200 tracking-widest uppercase mb-4">64-Bit Retro Medieval Action RPG</p>
             
-            <div class="text-left bg-slate-900/60 rounded-lg p-4 border border-amber-500/20 text-xs text-slate-300 space-y-2 mb-6">
-                <p class="text-amber-200 font-bold border-b border-slate-700 pb-1">KINGDOM ADVISORY:</p>
-                <p>• Explore the village, complete quests for NPC villagers, and find ancient relics.</p>
-                <p>• Rogue bandits roam outside the village perimeter. Slash them with your sword!</p>
-                <p>• Controls: <span class="text-amber-300">WASD</span> to walk, <span class="text-amber-300">SHIFT</span> to run, <span class="text-amber-300">MOUSE</span> to look, <span class="text-amber-300">LEFT-CLICK</span> to attack.</p>
+            <div class="text-left bg-black/60 p-3 border border-amber-900 text-xs text-slate-300 space-y-1.5 mb-5">
+                <p class="text-amber-300 font-bold border-b border-amber-800 pb-1">REALM ADVISORY:</p>
+                <p>• Low-resolution 64-bit software aesthetic styled after Project Shadowglass.</p>
+                <p>• Explore the coastal village, castle cliffs, and pine forests.</p>
+                <p>• Slash (<span class="text-amber-300">Left Click</span>) & Parry/Block (<span class="text-amber-300">Right Click</span>) dark knights & bandits.</p>
             </div>
 
-            <button id="btn-start" class="rpg-button w-full py-4 text-lg font-cinzel font-bold tracking-wider rounded-lg shadow-lg">
-                ENTER THE REALM
+            <button id="btn-start" class="retro-button w-full py-3 text-xl font-cinzel font-bold tracking-widest">
+                ENTER THE SHADOWGLASS
             </button>
         </div>
     </div>
 
-    <!-- Dialogue Box Modal -->
-    <div id="dialogue-modal" class="absolute inset-x-4 bottom-20 md:bottom-24 z-40 hidden pointer-events-auto flex justify-center">
-        <div class="rpg-panel max-w-2xl w-full p-5 border-amber-400/80 shadow-2xl flex gap-4 items-start">
-            <div class="w-14 h-14 rounded-lg bg-amber-900/50 border border-amber-500/40 flex items-center justify-center text-3xl flex-shrink-0" id="npc-avatar">
+    <!-- Dialogue Modal -->
+    <div id="dialogue-modal" class="absolute inset-x-4 bottom-20 z-40 hidden pointer-events-auto flex justify-center">
+        <div class="retro-panel max-w-2xl w-full p-4 flex gap-3 items-start border-amber-400">
+            <div class="w-12 h-12 bg-amber-950 border border-amber-600 flex items-center justify-center text-2xl flex-shrink-0">
                 🧙‍♂️
             </div>
             <div class="flex-grow">
                 <div class="flex justify-between items-center mb-1">
-                    <h3 id="npc-name" class="font-cinzel font-bold text-amber-300 text-base">Elder Bran</h3>
-                    <span class="text-[10px] text-slate-400 font-mono">PRESS [E] OR CLICK TO CONTINUE</span>
+                    <h3 id="npc-name" class="font-cinzel font-bold text-amber-300 text-sm">Elder Bran</h3>
+                    <span class="text-xs text-slate-400">[E] OR CLICK TO CONTINUE</span>
                 </div>
-                <p id="npc-dialogue-text" class="text-sm text-slate-200 leading-relaxed font-sans mb-3">Welcome, traveler! Our realm is endangered by roaming rogue bandits...</p>
-                <div id="dialogue-actions" class="flex gap-2 justify-end">
-                    <button id="btn-dialogue-next" class="rpg-button px-4 py-1.5 rounded text-xs font-bold">Continue</button>
+                <p id="npc-dialogue-text" class="text-base text-slate-200 leading-snug font-retro mb-2"></p>
+                <div class="flex justify-end">
+                    <button id="btn-dialogue-next" class="retro-button px-3 py-1 text-xs font-bold">Continue</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Inventory Modal -->
-    <div id="inventory-modal" class="absolute inset-0 z-40 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="rpg-panel max-w-md w-full p-6 border-amber-500/40 relative">
-            <div class="flex justify-between items-center border-b border-amber-500/20 pb-3 mb-4">
-                <h2 class="font-cinzel text-xl font-bold text-amber-300">INVENTORY BAG</h2>
-                <button id="btn-close-inventory" class="text-slate-400 hover:text-white font-bold text-lg">&times;</button>
-            </div>
-            <div class="grid grid-cols-4 gap-3 mb-4">
-                <!-- Items slots dynamic -->
-                <div class="bg-slate-900/80 border border-amber-500/30 rounded-lg p-3 flex flex-col items-center justify-center text-center">
-                    <span class="text-2xl mb-1">🗡️</span>
-                    <span class="text-[10px] font-bold text-amber-200">Steel Sword</span>
-                </div>
-                <div class="bg-slate-900/80 border border-amber-500/30 rounded-lg p-3 flex flex-col items-center justify-center text-center">
-                    <span class="text-2xl mb-1">🛡️</span>
-                    <span class="text-[10px] font-bold text-amber-200">Iron Shield</span>
-                </div>
-                <div class="bg-slate-900/80 border border-amber-500/30 rounded-lg p-3 flex flex-col items-center justify-center text-center">
-                    <span class="text-2xl mb-1">🧪</span>
-                    <span class="text-[10px] font-bold text-emerald-300">Health Potion</span>
-                </div>
-                <div id="relic-inv-slot" class="bg-slate-900/80 border border-slate-700 rounded-lg p-3 flex flex-col items-center justify-center text-center opacity-50">
-                    <span class="text-2xl mb-1">🔮</span>
-                    <span id="relic-inv-count" class="text-[10px] font-bold text-cyan-300">Relics: 0</span>
-                </div>
-            </div>
-            <div class="bg-slate-900/40 rounded p-3 text-xs text-slate-300 border border-amber-500/10">
-                <p class="font-semibold text-amber-400 mb-1">EQUIPPED GEAR:</p>
-                <p>• Royal Knight Sword (Damage: 25)</p>
-                <p>• Reinforced Shield (Block: +15 Armor)</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Javascript Logic -->
     <script>
-        // Web Audio API Synthesizer (Zero External File Dependencies)
-        class AudioEngine {
+        // --- WEB AUDIO API SYNTHESIZER ---
+        class SoundEngine {
             constructor() {
                 this.ctx = null;
                 this.muted = false;
@@ -289,43 +247,59 @@
                 const filter = this.ctx.createBiquadFilter();
 
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(60, this.ctx.currentTime + 0.15);
+                osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(70, this.ctx.currentTime + 0.16);
 
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(1000, this.ctx.currentTime);
+                filter.frequency.setValueAtTime(1200, this.ctx.currentTime);
 
-                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.16);
 
                 osc.connect(filter);
                 filter.connect(gain);
                 gain.connect(this.ctx.destination);
 
                 osc.start();
-                osc.stop(this.ctx.currentTime + 0.15);
+                osc.stop(this.ctx.currentTime + 0.16);
             }
 
-            playHitSound() {
+            playParry() {
                 if (this.muted || !this.ctx) return;
-                // Noise buffer for impact crunch
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(1200, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(400, this.ctx.currentTime + 0.2);
+
+                gain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.2);
+            }
+
+            playHit() {
+                if (this.muted || !this.ctx) return;
                 const bufferSize = this.ctx.sampleRate * 0.1;
                 const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
                 const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
 
                 const noise = this.ctx.createBufferSource();
                 noise.buffer = buffer;
 
                 const filter = this.ctx.createBiquadFilter();
                 filter.type = 'lowpass';
-                filter.frequency.setValueAtTime(400, this.ctx.currentTime);
+                filter.frequency.setValueAtTime(500, this.ctx.currentTime);
 
                 const gain = this.ctx.createGain();
                 gain.gain.setValueAtTime(0.5, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
 
                 noise.connect(filter);
                 filter.connect(gain);
@@ -334,17 +308,17 @@
                 noise.start();
             }
 
-            playCoinPickup() {
+            playPickup() {
                 if (this.muted || !this.ctx) return;
                 const now = this.ctx.currentTime;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
 
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(987.77, now); // B5
-                osc.frequency.setValueAtTime(1318.51, now + 0.08); // E6
+                osc.frequency.setValueAtTime(784, now); // G5
+                osc.frequency.setValueAtTime(1046.5, now + 0.08); // C6
 
-                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.setValueAtTime(0.25, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
 
                 osc.connect(gain);
@@ -359,7 +333,7 @@
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(80, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(75, this.ctx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(20, this.ctx.currentTime + 0.05);
 
                 gain.gain.setValueAtTime(0.08, this.ctx.currentTime);
@@ -371,27 +345,11 @@
                 osc.start();
                 osc.stop(this.ctx.currentTime + 0.05);
             }
-
-            playNPCBeep() {
-                if (this.muted || !this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440 + Math.random() * 100, this.ctx.currentTime);
-                
-                gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
-
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.08);
-            }
         }
 
-        const audio = new AudioEngine();
+        const audio = new SoundEngine();
 
+        // --- GAME STATE ---
         const gameState = {
             started: false,
             health: 100,
@@ -405,479 +363,334 @@
             banditsDefeated: 0,
             requiredBandits: 3,
             quests: [
-                {
-                    title: "Speak to Elder Bran",
-                    desc: "Find Elder Bran near the central bonfire.",
-                    targetType: "npc",
-                    completed: false
-                },
-                {
-                    title: "Collect Ancient Relics",
-                    desc: "Gather 5 glowing purple relics hidden in the village.",
-                    targetType: "relics",
-                    completed: false
-                },
-                {
-                    title: "Defeat Rogue Bandits",
-                    desc: "Vanquish 3 rogue bandits roaming outside the village.",
-                    targetType: "bandits",
-                    completed: false
-                },
-                {
-                    title: "Hero of Eldoria",
-                    desc: "You have restored peace to the village! Free roam unlocked.",
-                    targetType: "done",
-                    completed: true
-                }
+                { title: "Speak to Elder Bran", desc: "Locate Elder Bran near the central bonfire." },
+                { title: "Collect Ancient Relics", desc: "Gather 5 glowing cyan relics around the village." },
+                { title: "Defeat Castle Guard Bandits", desc: "Vanquish 3 rogue knights near the castle cliffs." },
+                { title: "Champion of Shadowglass", desc: "You have restored peace! Free roam unlocked." }
             ]
         };
 
-        let scene, camera, renderer;
+        // --- PROCEDURAL PIXEL TEXTURE GENERATORS ---
+        function createCobblestoneTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#2c2523'; ctx.fillRect(0, 0, 64, 64);
+
+            for (let x = 0; x < 64; x += 16) {
+                for (let y = 0; y < 64; y += 16) {
+                    const shift = (y / 16) % 2 === 0 ? 0 : 8;
+                    const px = (x + shift) % 64;
+                    ctx.fillStyle = (Math.random() > 0.5) ? '#4a4038' : '#38302a';
+                    ctx.fillRect(px + 1, y + 1, 14, 14);
+                    ctx.fillStyle = '#1a1513';
+                    ctx.fillRect(px, y, 16, 1);
+                    ctx.fillRect(px, y, 1, 16);
+                }
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.magFilter = THREE.NearestFilter;
+            tex.minFilter = THREE.NearestFilter;
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            return tex;
+        }
+
+        function createTimberWallTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#5c4d3c'; ctx.fillRect(0, 0, 64, 64); // plaster base
+
+            // Timber frames
+            ctx.fillStyle = '#2a1e12';
+            ctx.fillRect(0, 0, 64, 8);
+            ctx.fillRect(0, 56, 64, 8);
+            ctx.fillRect(0, 0, 8, 64);
+            ctx.fillRect(56, 0, 8, 64);
+            // Diagonal beam
+            ctx.beginPath();
+            ctx.lineWidth = 6;
+            ctx.strokeStyle = '#2a1e12';
+            ctx.moveTo(8, 8); ctx.lineTo(56, 56);
+            ctx.stroke();
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.magFilter = THREE.NearestFilter;
+            tex.minFilter = THREE.NearestFilter;
+            return tex;
+        }
+
+        function createRoofTileTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32; canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#7a221e'; ctx.fillRect(0, 0, 32, 32);
+            ctx.fillStyle = '#4a1210';
+            for (let y = 0; y < 32; y += 8) {
+                ctx.fillRect(0, y, 32, 2);
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.magFilter = THREE.NearestFilter;
+            tex.minFilter = THREE.NearestFilter;
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            return tex;
+        }
+
+        // --- THREE.JS SYSTEM & OFFSCREEN LOW-RES BUFFER ---
+        let scene, camera, renderer, offscreenTarget, virtualScene, quadMesh;
         let clock = new THREE.Clock();
-        
-        // Player & Camera Setup
+
+        // RETRO RENDER RESOLUTION (Project Shadowglass 64-bit crisp pixel scaling)
+        const RENDER_WIDTH = 384;
+        const RENDER_HEIGHT = 216;
+
         const player = {
-            position: new THREE.Vector3(0, 1.6, 12),
+            position: new THREE.Vector3(0, 1.6, 16),
             velocity: new THREE.Vector3(),
             rotation: new THREE.Euler(0, 0, 0, 'YXZ'),
             isGrounded: true,
             isSprinting: false,
-            speed: 6.0,
-            sprintSpeed: 10.5,
+            speed: 6.5,
+            sprintSpeed: 11.0,
             jumpForce: 7.0,
             height: 1.6,
             swordMesh: null,
-            shieldMesh: null,
             isAttacking: false,
+            isBlocking: false,
             attackTime: 0
         };
 
-        // Entities arrays
         const npcs = [];
         const enemies = [];
         const collectibles = [];
         const environmentColliders = [];
         const particleEffects = [];
 
-        // Lighting reference for campfire flicker
-        let campfireLight;
-
-        function initThree() {
+        function initEngine() {
             const container = document.getElementById('canvas-container');
 
+            // Primary 3D Scene
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x1a1c23);
-            scene.fog = new THREE.FogExp2(0x1a1c23, 0.018);
+            scene.background = new THREE.Color(0x181424);
+            scene.fog = new THREE.FogExp2(0x181424, 0.015);
 
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 500);
-            
-            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+            camera = new THREE.PerspectiveCamera(72, RENDER_WIDTH / RENDER_HEIGHT, 0.1, 300);
+
+            // Offscreen Low-Res Render Target for 64-bit Pixelation
+            offscreenTarget = new THREE.WebGLRenderTarget(RENDER_WIDTH, RENDER_HEIGHT, {
+                minFilter: THREE.NearestFilter,
+                magFilter: THREE.NearestFilter,
+                format: THREE.RGBAFormat
+            });
+
+            // Display Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: false });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.domElement.id = "game-canvas";
             container.appendChild(renderer.domElement);
 
-            // Sky & Environment Lights
-            const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.4);
-            scene.add(ambientLight);
+            // Fullscreen Quad Scene for Crisp Low-Res Blitting
+            virtualScene = new THREE.Scene();
+            const quadCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+            const quadMat = new THREE.MeshBasicMaterial({ map: offscreenTarget.texture });
+            quadMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), quadMat);
+            virtualScene.add(quadMesh);
 
-            const sunLight = new THREE.DirectionalLight(0xfff1d6, 1.2);
-            sunLight.position.set(40, 60, -20);
-            sunLight.castShadow = true;
-            sunLight.shadow.mapSize.width = 2048;
-            sunLight.shadow.mapSize.height = 2048;
-            sunLight.shadow.camera.near = 0.5;
-            sunLight.shadow.camera.far = 150;
-            const d = 50;
-            sunLight.shadow.camera.left = -d;
-            sunLight.shadow.camera.right = d;
-            sunLight.shadow.camera.top = d;
-            sunLight.shadow.camera.bottom = -d;
-            scene.add(sunLight);
+            // Lighting Setup
+            const ambient = new THREE.AmbientLight(0xc7d2fe, 0.45);
+            scene.add(ambient);
 
-            // Ground Skybox Hemispheric Warmth
-            const hemiLight = new THREE.HemisphereLight(0xffebd7, 0x0f172a, 0.5);
-            scene.add(hemiLight);
+            const sun = new THREE.DirectionalLight(0xffedd5, 1.2);
+            sun.position.set(45, 60, -30);
+            scene.add(sun);
 
-            buildMedievalVillage();
-            setupPlayerWeapon();
-            spawnNPCs();
-            spawnCollectibles();
-            spawnEnemies();
+            const hemi = new THREE.HemisphereLight(0xfde047, 0x1e1b4b, 0.4);
+            scene.add(hemi);
+
+            buildShadowglassWorld();
+            setupFirstPersonWeapon();
+            spawnEntities();
 
             window.addEventListener('resize', onWindowResize);
         }
 
-        function buildMedievalVillage() {
-            // Ground Mesh with Cobblestone Tint Gradient
-            const groundGeo = new THREE.PlaneGeometry(160, 160, 32, 32);
-            const groundMat = new THREE.MeshStandardMaterial({ 
-                color: 0x2d3728, 
-                roughness: 0.9, 
-                metalness: 0.1 
-            });
+        function buildShadowglassWorld() {
+            // Ground with Cobblestone
+            const cobbleTex = createCobblestoneTexture();
+            cobbleTex.repeat.set(20, 20);
+            const groundGeo = new THREE.PlaneGeometry(160, 160);
+            const groundMat = new THREE.MeshStandardMaterial({ map: cobbleTex, roughness: 0.9 });
             const ground = new THREE.Mesh(groundGeo, groundMat);
             ground.rotation.x = -Math.PI / 2;
-            ground.receiveShadow = true;
             scene.add(ground);
 
-            // Village Cobblestone Path Center
-            const pathGeo = new THREE.CircleGeometry(18, 32);
-            const pathMat = new THREE.MeshStandardMaterial({ color: 0x4a433b, roughness: 0.8 });
-            const path = new THREE.Mesh(pathGeo, pathMat);
-            path.rotation.x = -Math.PI / 2;
-            path.position.y = 0.01;
-            path.receiveShadow = true;
-            scene.add(path);
+            // Majestic Castle Spire (Project Shadowglass Backdrop)
+            buildCastleOnCliffs(0, 0, -55);
 
-            // Outer Castle Walls
-            buildCastleWallRing(65);
+            // Cottages with Timber & Clay Roofs
+            buildCottage(-14, 0, -10, 0.3);
+            buildCottage(14, 0, -12, -0.4);
+            buildCottage(-16, 0, 10, 1.2);
 
-            // Bonfire in Village Center
-            createCampfire(0, 0, 0);
-
-            // Cottages and Watchtowers around the plaza
-            createCottage(-12, 0, -10, 0.2);
-            createCottage(14, 0, -8, -0.4);
-            createCottage(-15, 0, 8, 1.2);
-            createCottage(10, 0, 12, -1.1);
-
-            createWatchtower(-25, 0, -25);
-            createWatchtower(25, 0, -25);
-            createWatchtower(-25, 0, 25);
-            createWatchtower(25, 0, 25);
-
-            // Trees & Foliage scattered
-            for (let i = 0; i < 35; i++) {
+            // Pine Forest Frame
+            for (let i = 0; i < 40; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const dist = 18 + Math.random() * 40;
+                const dist = 20 + Math.random() * 45;
                 const x = Math.cos(angle) * dist;
                 const z = Math.sin(angle) * dist;
-                createLowPolyTree(x, 0, z);
+                if (z > -40) buildRetroPineTree(x, 0, z);
             }
+
+            // Bonfire Flame Light
+            const fireLight = new THREE.PointLight(0xf97316, 2.5, 20);
+            fireLight.position.set(0, 1.2, 0);
+            scene.add(fireLight);
         }
 
-        function createCottage(x, y, z, rotation) {
-            const group = new THREE.Group();
+        function buildCastleOnCliffs(x, y, z) {
+            const castle = new THREE.Group();
+            const stoneMat = new THREE.MeshStandardMaterial({ color: 0x374151, roughness: 0.8 });
 
-            // Main Wood Structure
-            const bodyGeo = new THREE.BoxGeometry(6, 4, 5);
-            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.8 });
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
-            body.position.y = 2;
-            body.castShadow = true;
-            body.receiveShadow = true;
-            group.add(body);
+            // High Cliffs
+            const cliff = new THREE.Mesh(new THREE.BoxGeometry(70, 20, 40), stoneMat);
+            cliff.position.set(0, 10, 0);
+            castle.add(cliff);
 
-            // Roof (Prism / Cone)
-            const roofGeo = new THREE.ConeGeometry(4.8, 2.5, 4);
-            const roofMat = new THREE.MeshStandardMaterial({ color: 0x8b0000, roughness: 0.6 });
-            const roof = new THREE.Mesh(roofGeo, roofMat);
-            roof.position.y = 5.25;
+            // Main Keep
+            const keep = new THREE.Mesh(new THREE.BoxGeometry(24, 30, 20), stoneMat);
+            keep.position.set(0, 30, -5);
+            castle.add(keep);
+
+            // Spire Tower
+            const spire = new THREE.Mesh(new THREE.CylinderGeometry(4, 6, 40, 8), stoneMat);
+            spire.position.set(0, 50, -5);
+            castle.add(spire);
+
+            const coneRoof = new THREE.Mesh(new THREE.ConeGeometry(5, 16, 8), new THREE.MeshStandardMaterial({ color: 0x1e1b4b }));
+            coneRoof.position.set(0, 78, -5);
+            castle.add(coneRoof);
+
+            castle.position.set(x, y, z);
+            scene.add(castle);
+        }
+
+        function buildCottage(x, y, z, rot) {
+            const cottage = new THREE.Group();
+
+            const wallMat = new THREE.MeshStandardMaterial({ map: createTimberWallTexture(), roughness: 0.8 });
+            const body = new THREE.Mesh(new THREE.BoxGeometry(6, 4.5, 5), wallMat);
+            body.position.y = 2.25;
+            cottage.add(body);
+
+            const roofTex = createRoofTileTexture();
+            roofTex.repeat.set(2, 2);
+            const roofMat = new THREE.MeshStandardMaterial({ map: roofTex, roughness: 0.6 });
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(4.8, 3, 4), roofMat);
+            roof.position.y = 5.75;
             roof.rotation.y = Math.PI / 4;
-            roof.castShadow = true;
-            group.add(roof);
+            cottage.add(roof);
 
-            // Wooden Door
-            const doorGeo = new THREE.BoxGeometry(1.2, 2.2, 0.2);
-            const doorMat = new THREE.MeshStandardMaterial({ color: 0x2d1e18 });
-            const door = new THREE.Mesh(doorGeo, doorMat);
-            door.position.set(0, 1.1, 2.55);
-            group.add(door);
+            cottage.position.set(x, y, z);
+            cottage.rotation.y = rot;
+            scene.add(cottage);
 
-            group.position.set(x, y, z);
-            group.rotation.y = rotation;
-            scene.add(group);
-
-            // Add Collider Box
-            environmentColliders.push(new THREE.Box3().setFromObject(group));
+            environmentColliders.push(new THREE.Box3().setFromObject(cottage));
         }
 
-        function createWatchtower(x, y, z) {
-            const towerGroup = new THREE.Group();
-
-            // Pillar Legs
-            const legGeo = new THREE.CylinderGeometry(0.3, 0.4, 8, 6);
-            const woodMat = new THREE.MeshStandardMaterial({ color: 0x3d2817, roughness: 0.9 });
-
-            const offsets = [[-1.5, -1.5], [1.5, -1.5], [-1.5, 1.5], [1.5, 1.5]];
-            offsets.forEach(off => {
-                const leg = new THREE.Mesh(legGeo, woodMat);
-                leg.position.set(off[0], 4, off[1]);
-                leg.castShadow = true;
-                towerGroup.add(leg);
-            });
-
-            // Top Platform
-            const platGeo = new THREE.BoxGeometry(4, 0.4, 4);
-            const platform = new THREE.Mesh(platGeo, woodMat);
-            platform.position.y = 8;
-            towerGroup.add(platform);
-
-            // Tower Roof
-            const roofGeo = new THREE.ConeGeometry(3.2, 2, 4);
-            const roofMat = new THREE.MeshStandardMaterial({ color: 0x2b1e14 });
-            const roof = new THREE.Mesh(roofGeo, roofMat);
-            roof.position.y = 10;
-            roof.rotation.y = Math.PI / 4;
-            towerGroup.add(roof);
-
-            towerGroup.position.set(x, y, z);
-            scene.add(towerGroup);
-
-            environmentColliders.push(new THREE.Box3().setFromObject(towerGroup));
-        }
-
-        function createCampfire(x, y, z) {
-            const fireGroup = new THREE.Group();
-
-            // Rock Ring
-            const rockMat = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.9 });
-            for (let i = 0; i < 8; i++) {
-                const angle = (i / 8) * Math.PI * 2;
-                const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(0.35), rockMat);
-                rock.position.set(Math.cos(angle) * 1.2, 0.2, Math.sin(angle) * 1.2);
-                fireGroup.add(rock);
-            }
-
-            // Glowing Light
-            campfireLight = new THREE.PointLight(0xff7700, 2.5, 18);
-            campfireLight.position.set(0, 1.2, 0);
-            campfireLight.castShadow = true;
-            fireGroup.add(campfireLight);
-
-            // Log mesh
-            const logMat = new THREE.MeshStandardMaterial({ color: 0x2a1810 });
-            const logGeo = new THREE.CylinderGeometry(0.12, 0.12, 1.5);
-            for (let i = 0; i < 3; i++) {
-                const log = new THREE.Mesh(logGeo, logMat);
-                log.rotation.z = Math.PI / 3;
-                log.rotation.y = (i * Math.PI) / 3;
-                log.position.y = 0.3;
-                fireGroup.add(log);
-            }
-
-            fireGroup.position.set(x, y, z);
-            scene.add(fireGroup);
-        }
-
-        function buildCastleWallRing(radius) {
-            const segments = 24;
-            const wallMat = new THREE.MeshStandardMaterial({ color: 0x4b5563, roughness: 0.8 });
-
-            for (let i = 0; i < segments; i++) {
-                // Leave a gap for front entrance
-                if (i === 11 || i === 12) continue;
-
-                const angle = (i / segments) * Math.PI * 2;
-                const nextAngle = ((i + 1) / segments) * Math.PI * 2;
-
-                const x1 = Math.cos(angle) * radius;
-                const z1 = Math.sin(angle) * radius;
-                const x2 = Math.cos(nextAngle) * radius;
-                const z2 = Math.sin(nextAngle) * radius;
-
-                const dx = x2 - x1;
-                const dz = z2 - z1;
-                const len = Math.sqrt(dx * dx + dz * dz);
-
-                const wallGeo = new THREE.BoxGeometry(len, 8, 2);
-                const wall = new THREE.Mesh(wallGeo, wallMat);
-
-                wall.position.set((x1 + x2) / 2, 4, (z1 + z2) / 2);
-                wall.rotation.y = -Math.atan2(dz, dx);
-                wall.castShadow = true;
-                wall.receiveShadow = true;
-
-                scene.add(wall);
-                environmentColliders.push(new THREE.Box3().setFromObject(wall));
-            }
-        }
-
-        function createLowPolyTree(x, y, z) {
+        function buildRetroPineTree(x, y, z) {
             const tree = new THREE.Group();
-
-            const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 3, 5);
-            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a2e18, roughness: 0.9 });
-            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 3, 6), new THREE.MeshStandardMaterial({ color: 0x271a0c }));
             trunk.position.y = 1.5;
-            trunk.castShadow = true;
             tree.add(trunk);
 
-            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x1e4620, roughness: 0.6, flatShading: true });
-            const leaves1 = new THREE.Mesh(new THREE.ConeGeometry(2.2, 3.5, 5), leavesMat);
-            leaves1.position.y = 3.5;
-            leaves1.castShadow = true;
-            tree.add(leaves1);
-
-            const leaves2 = new THREE.Mesh(new THREE.ConeGeometry(1.6, 2.8, 5), leavesMat);
-            leaves2.position.y = 4.8;
-            leaves2.castShadow = true;
-            tree.add(leaves2);
-
+            const pineMat = new THREE.MeshStandardMaterial({ color: 0x143519, roughness: 0.7, flatShading: true });
+            for (let i = 0; i < 3; i++) {
+                const cone = new THREE.Mesh(new THREE.ConeGeometry(2.5 - i * 0.5, 3, 6), pineMat);
+                cone.position.y = 3 + i * 1.6;
+                tree.add(cone);
+            }
             tree.position.set(x, y, z);
-            const scale = 0.8 + Math.random() * 0.5;
-            tree.scale.set(scale, scale, scale);
             scene.add(tree);
         }
 
-        function setupPlayerWeapon() {
+        function setupFirstPersonWeapon() {
             const weaponGroup = new THREE.Group();
 
-            // Steel Sword Blade
-            const bladeGeo = new THREE.BoxGeometry(0.08, 1.2, 0.02);
-            const bladeMat = new THREE.MeshStandardMaterial({ color: 0xd1d5db, metalness: 0.85, roughness: 0.2 });
+            // Longsword Blade
+            const bladeGeo = new THREE.BoxGeometry(0.06, 1.4, 0.02);
+            const bladeMat = new THREE.MeshStandardMaterial({ color: 0xe5e7eb, metalness: 0.9, roughness: 0.1 });
             const blade = new THREE.Mesh(bladeGeo, bladeMat);
-            blade.position.y = 0.6;
+            blade.position.y = 0.7;
             weaponGroup.add(blade);
 
-            // Guard & Hilt
-            const guardGeo = new THREE.BoxGeometry(0.3, 0.05, 0.06);
-            const hiltMat = new THREE.MeshStandardMaterial({ color: 0xb45309, metalness: 0.5 });
-            const guard = new THREE.Mesh(guardGeo, hiltMat);
+            // Crossguard & Pommel
+            const guard = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.04, 0.06), new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.7 }));
             guard.position.y = 0.02;
             weaponGroup.add(guard);
 
-            const handleGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.25);
-            const handle = new THREE.Mesh(handleGeo, hiltMat);
+            const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.25), new THREE.MeshStandardMaterial({ color: 0x1a120b }));
             handle.position.y = -0.12;
             weaponGroup.add(handle);
 
-            // Attach sword to camera perspective
-            weaponGroup.position.set(0.4, -0.3, -0.6);
-            weaponGroup.rotation.set(0.2, -0.3, 0);
+            // FPS Camera Viewmodel Attachment
+            weaponGroup.position.set(0.35, -0.32, -0.55);
+            weaponGroup.rotation.set(0.15, -0.2, 0);
             camera.add(weaponGroup);
             scene.add(camera);
 
             player.swordMesh = weaponGroup;
         }
 
-        function spawnNPCs() {
-            // Elder Bran (Quest Giver NPC)
+        function spawnEntities() {
+            // Elder Bran NPC
             const npcGroup = new THREE.Group();
-            
-            // Body
-            const bodyGeo = new THREE.CylinderGeometry(0.4, 0.5, 1.6, 8);
-            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x1e3a8a }); // Blue robe
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.45, 1.6, 8), new THREE.MeshStandardMaterial({ color: 0x1e3a8a }));
             body.position.y = 0.8;
             npcGroup.add(body);
 
-            // Head
-            const headGeo = new THREE.SphereGeometry(0.25, 8, 8);
-            const headMat = new THREE.MeshStandardMaterial({ color: 0xfde047 });
-            const head = new THREE.Mesh(headGeo, headMat);
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), new THREE.MeshStandardMaterial({ color: 0xfde047 }));
             head.position.y = 1.7;
             npcGroup.add(head);
-
-            // Wizard Hat
-            const hatGeo = new THREE.ConeGeometry(0.35, 0.8, 8);
-            const hatMat = new THREE.MeshStandardMaterial({ color: 0x1e1b4b });
-            const hat = new THREE.Mesh(hatGeo, hatMat);
-            hat.position.y = 2.2;
-            npcGroup.add(hat);
 
             npcGroup.position.set(3, 0, 3);
             scene.add(npcGroup);
 
-            npcs.push({
-                name: "Elder Bran",
-                mesh: npcGroup,
-                position: npcGroup.position,
-                dialogue: [
-                    "Greetings, brave traveler! Welcome to Eldoria.",
-                    "Our village is under threat by rogue bandits lurking outside our walls.",
-                    "First, seek out the 5 Ancient Mystic Relics scattered near our cottages to empower your shield!",
-                    "Return to me once you have gathered all 5 relics!"
-                ]
-            });
-        }
+            npcs.push({ name: "Elder Bran", position: npcGroup.position });
 
-        function spawnCollectibles() {
+            // Relics
             const relicGeo = new THREE.OctahedronGeometry(0.35);
-            const relicMat = new THREE.MeshStandardMaterial({ 
-                color: 0x06b6d4, 
-                emissive: 0x0891b2, 
-                emissiveIntensity: 0.6,
-                roughness: 0.2
-            });
+            const relicMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0891b2, emissiveIntensity: 0.8 });
+            const posList = [new THREE.Vector3(-10, 0.8, -8), new THREE.Vector3(12, 0.8, -12), new THREE.Vector3(-14, 0.8, 10), new THREE.Vector3(12, 0.8, 14), new THREE.Vector3(0, 0.8, -20)];
 
-            const positions = [
-                new THREE.Vector3(-10, 0.8, -8),
-                new THREE.Vector3(12, 0.8, -12),
-                new THREE.Vector3(-14, 0.8, 10),
-                new THREE.Vector3(12, 0.8, 14),
-                new THREE.Vector3(0, 0.8, -20)
-            ];
-
-            positions.forEach((pos, idx) => {
+            posList.forEach((pos, i) => {
                 const mesh = new THREE.Mesh(relicGeo, relicMat);
                 mesh.position.copy(pos);
                 scene.add(mesh);
-
-                const light = new THREE.PointLight(0x06b6d4, 1, 4);
-                light.position.copy(pos);
-                scene.add(light);
-
-                collectibles.push({
-                    type: 'relic',
-                    id: idx,
-                    mesh: mesh,
-                    light: light,
-                    collected: false
-                });
+                collectibles.push({ mesh, collected: false });
             });
-        }
 
-        function spawnEnemies() {
-            const enemyPositions = [
-                new THREE.Vector3(-35, 0, -35),
-                new THREE.Vector3(35, 0, -35),
-                new THREE.Vector3(-35, 0, 35),
-                new THREE.Vector3(35, 0, 35),
-                new THREE.Vector3(0, 0, 45)
-            ];
-
-            enemyPositions.forEach((pos, i) => {
+            // Bandits / Dark Knights near Castle Cliffs
+            const enemyPos = [new THREE.Vector3(-25, 0, -35), new THREE.Vector3(0, 0, -40), new THREE.Vector3(25, 0, -35)];
+            enemyPos.forEach((pos, i) => {
                 const group = new THREE.Group();
-
-                // Rogue Bandit Body
-                const bodyGeo = new THREE.CylinderGeometry(0.4, 0.45, 1.6, 8);
-                const bodyMat = new THREE.MeshStandardMaterial({ color: 0x881337 }); // Crimson Rogue
-                const body = new THREE.Mesh(bodyGeo, bodyMat);
-                body.position.y = 0.8;
-                body.castShadow = true;
-                group.add(body);
-
-                // Head
-                const headGeo = new THREE.SphereGeometry(0.25, 8, 8);
-                const headMat = new THREE.MeshStandardMaterial({ color: 0x374151 });
-                const head = new THREE.Mesh(headGeo, headMat);
-                head.position.y = 1.65;
-                group.add(head);
+                const bBody = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.5, 1.7, 8), new THREE.MeshStandardMaterial({ color: 0x450a0a }));
+                bBody.position.y = 0.85;
+                group.add(bBody);
 
                 group.position.copy(pos);
                 scene.add(group);
 
-                enemies.push({
-                    id: i,
-                    mesh: group,
-                    hp: 60,
-                    maxHp: 60,
-                    speed: 2.8,
-                    state: 'idle', // idle, chase, hit
-                    alive: true,
-                    lastAttack: 0
-                });
+                enemies.push({ id: i, mesh: group, hp: 60, maxHp: 60, speed: 3.0, alive: true, lastAttack: 0 });
             });
         }
 
-        const keys = { KeyW: false, KeyS: false, KeyA: false, KeyD: false, ShiftLeft: false, Space: false, KeyE: false };
+        // --- INPUT & CONTROLS ---
+        const keys = { KeyW: false, KeyS: false, KeyA: false, KeyD: false, ShiftLeft: false, Space: false };
         let isPointerLocked = false;
 
         function setupControls() {
-            // Pointer Lock for FPS/TPS Look
             document.addEventListener('click', (e) => {
                 if (!gameState.started) return;
                 if (document.pointerLockElement !== document.body && e.target.tagName !== 'BUTTON') {
@@ -891,16 +704,12 @@
 
             document.addEventListener('mousemove', (e) => {
                 if (!isPointerLocked) return;
-
                 const sensitivity = 0.0022;
                 player.rotation.y -= e.movementX * sensitivity;
                 player.rotation.x -= e.movementY * sensitivity;
-
-                // Clamp pitch angle
-                player.rotation.x = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, player.rotation.x));
+                player.rotation.x = Math.max(-Math.PI / 2.4, Math.min(Math.PI / 2.4, player.rotation.x));
             });
 
-            // Keyboard Listeners
             window.addEventListener('keydown', (e) => {
                 if (keys.hasOwnProperty(e.code)) keys[e.code] = true;
                 if (e.code === 'KeyE') handleInteraction();
@@ -910,19 +719,27 @@
                 if (keys.hasOwnProperty(e.code)) keys[e.code] = false;
             });
 
-            // Mouse Attack Trigger
             window.addEventListener('mousedown', (e) => {
-                if (e.button === 0 && isPointerLocked) {
-                    performAttack();
-                }
+                if (!isPointerLocked) return;
+                if (e.button === 0) performAttack(); // Left Click Slash
+                if (e.button === 2) performBlock(true); // Right Click Block
             });
 
-            // UI Button Bindings
+            window.addEventListener('mouseup', (e) => {
+                if (e.button === 2) performBlock(false);
+            });
+
+            // Prevent Right-click Context Menu
+            window.addEventListener('contextmenu', e => e.preventDefault());
+
             document.getElementById('btn-start').addEventListener('click', startGame);
-            document.getElementById('btn-audio').addEventListener('click', toggleAudio);
-            document.getElementById('btn-inventory').addEventListener('click', toggleInventoryModal);
-            document.getElementById('btn-close-inventory').addEventListener('click', toggleInventoryModal);
-            document.getElementById('btn-dialogue-next').addEventListener('click', advanceDialogue);
+            document.getElementById('btn-audio').addEventListener('click', () => {
+                audio.muted = !audio.muted;
+                document.getElementById('audio-icon').textContent = audio.muted ? '🔇' : '🔊';
+            });
+            document.getElementById('btn-dialogue-next').addEventListener('click', () => {
+                document.getElementById('dialogue-modal').classList.add('hidden');
+            });
         }
 
         function startGame() {
@@ -932,124 +749,51 @@
             document.body.requestPointerLock();
         }
 
-        function toggleAudio() {
-            audio.muted = !audio.muted;
-            document.getElementById('audio-icon').textContent = audio.muted ? '🔇' : '🔊';
-        }
-
-        function toggleInventoryModal() {
-            const modal = document.getElementById('inventory-modal');
-            modal.classList.toggle('hidden');
-            if (!modal.classList.contains('hidden') && isPointerLocked) {
-                document.exitPointerLock();
-            }
-        }
-
         function performAttack() {
-            if (player.isAttacking) return;
-
+            if (player.isAttacking || player.isBlocking) return;
             player.isAttacking = true;
             player.attackTime = 0;
             audio.playSwordSwing();
 
-            // Melee Hit Detection Box in front of player camera
-            const attackRay = new THREE.Raycaster();
-            attackRay.setFromCamera(new THREE.Vector2(0, 0), camera);
+            // Melee Hit Raycast
+            const ray = new THREE.Raycaster();
+            ray.setFromCamera(new THREE.Vector2(0, 0), camera);
+            const hits = ray.intersectObjects(enemies.map(e => e.mesh), true);
 
-            const hits = attackRay.intersectObjects(enemies.map(e => e.mesh), true);
             if (hits.length > 0 && hits[0].distance < 3.5) {
                 const hitObj = hits[0].object;
-                // Find parent enemy object
                 const enemy = enemies.find(e => e.mesh === hitObj.parent || e.mesh === hitObj);
                 if (enemy && enemy.alive) {
-                    damageEnemy(enemy, 30);
+                    enemy.hp -= 30;
+                    audio.playHit();
+                    if (enemy.hp <= 0) {
+                        enemy.alive = false;
+                        scene.remove(enemy.mesh);
+                        gameState.gold += 30;
+                        gameState.banditsDefeated++;
+                        updateHUD();
+                    }
                 }
             }
         }
 
-        function damageEnemy(enemy, amount) {
-            enemy.hp -= amount;
-            audio.playHitSound();
-
-            // Knockback effect away from player
-            const dir = new THREE.Vector3().subVectors(enemy.mesh.position, player.position).normalize();
-            enemy.mesh.position.addScaledVector(dir, 1.2);
-
-            // Spawn dynamic slash particle effect
-            spawnHitParticle(enemy.mesh.position);
-
-            if (enemy.hp <= 0) {
-                enemy.alive = false;
-                scene.remove(enemy.mesh);
-                gameState.gold += 25;
-                gameState.banditsDefeated++;
-                updateHUD();
-                checkQuestProgress('bandit');
+        function performBlock(blocking) {
+            player.isBlocking = blocking;
+            if (blocking) {
+                player.swordMesh.position.set(0.1, -0.2, -0.45);
+                player.swordMesh.rotation.set(0.5, -0.8, 0.8);
+            } else {
+                player.swordMesh.position.set(0.35, -0.32, -0.55);
+                player.swordMesh.rotation.set(0.15, -0.2, 0);
             }
-        }
-
-        function spawnHitParticle(pos) {
-            const pGeo = new THREE.BufferGeometry();
-            const count = 12;
-            const positions = new Float32Array(count * 3);
-            for (let i = 0; i < count * 3; i++) {
-                positions[i] = (Math.random() - 0.5) * 0.8;
-            }
-            pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            const pMat = new THREE.PointsMaterial({ color: 0xef4444, size: 0.15 });
-            const p = new THREE.Points(pGeo, pMat);
-            p.position.copy(pos);
-            p.position.y += 1.0;
-            scene.add(p);
-
-            particleEffects.push({ mesh: p, life: 0.3 });
         }
 
         function handleInteraction() {
-            // Check closeness to Elder Bran
-            const elder = npcs[0];
-            const dist = player.position.distanceTo(elder.position);
-
-            if (dist < 4.0) {
-                showDialogue(elder);
-            }
-        }
-
-        function showDialogue(npc) {
-            const modal = document.getElementById('dialogue-modal');
-            document.getElementById('npc-name').textContent = npc.name;
-            
-            const quest = gameState.quests[gameState.currentQuestIndex];
-            let text = npc.dialogue[0];
-
-            if (gameState.currentQuestIndex === 0) {
-                text = "Welcome Hero! Roaming bandits threaten our borders. Please collect 5 Ancient Relics around the village cottages first!";
-                gameState.currentQuestIndex = 1;
-                updateHUD();
-            } else if (gameState.currentQuestIndex === 1 && gameState.relics >= gameState.maxRelics) {
-                text = "Excellent work gathering the Relics! Now defeat 3 Rogue Bandits outside the castle perimeter walls!";
-                gameState.currentQuestIndex = 2;
-                updateHUD();
-            } else if (gameState.currentQuestIndex === 2 && gameState.banditsDefeated >= gameState.requiredBandits) {
-                text = "You have saved Eldoria! Take this honor and title as Champion of the Realm!";
-                gameState.currentQuestIndex = 3;
-                updateHUD();
-            }
-
-            document.getElementById('npc-dialogue-text').textContent = text;
-            modal.classList.remove('hidden');
-            audio.playNPCBeep();
-        }
-
-        function advanceDialogue() {
-            document.getElementById('dialogue-modal').classList.add('hidden');
-        }
-
-        function checkQuestProgress(type) {
-            if (type === 'relic' && gameState.relics >= gameState.maxRelics && gameState.currentQuestIndex === 1) {
-                document.getElementById('quest-desc').textContent = "Return to Elder Bran for your next objective!";
-            } else if (type === 'bandit' && gameState.banditsDefeated >= gameState.requiredBandits && gameState.currentQuestIndex === 2) {
-                document.getElementById('quest-desc').textContent = "Return to Elder Bran to report your victory!";
+            if (player.position.distanceTo(npcs[0].position) < 4.0) {
+                const modal = document.getElementById('dialogue-modal');
+                document.getElementById('npc-name').textContent = "Elder Bran";
+                document.getElementById('npc-dialogue-text').textContent = "Traveler! Gather the 5 Mystic Relics around the village cottages, then vanquish the rogue bandits near the castle cliffs!";
+                modal.classList.remove('hidden');
             }
         }
 
@@ -1058,17 +802,15 @@
         function updatePlayer(delta) {
             if (!gameState.started) return;
 
-            // Sprinting & Stamina Engine
             player.isSprinting = keys.ShiftLeft && gameState.stamina > 5;
             const moveSpeed = player.isSprinting ? player.sprintSpeed : player.speed;
 
             if (player.isSprinting) {
-                gameState.stamina = Math.max(0, gameState.stamina - delta * 30);
+                gameState.stamina = Math.max(0, gameState.stamina - delta * 28);
             } else {
                 gameState.stamina = Math.min(gameState.maxStamina, gameState.stamina + delta * 20);
             }
 
-            // Input Movement Vectors
             const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y);
             const side = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y);
 
@@ -1079,91 +821,68 @@
             if (keys.KeyA) moveDir.sub(side);
             moveDir.normalize();
 
-            // Footstep Sound loop
             if (moveDir.lengthSq() > 0 && player.isGrounded) {
                 footstepTimer += delta;
-                const interval = player.isSprinting ? 0.28 : 0.45;
-                if (footstepTimer > interval) {
+                if (footstepTimer > (player.isSprinting ? 0.28 : 0.45)) {
                     audio.playFootstep();
                     footstepTimer = 0;
                 }
             }
 
-            // Apply Horizontal Velocity
             player.velocity.x = moveDir.x * moveSpeed;
             player.velocity.z = moveDir.z * moveSpeed;
 
-            // Jump Gravity Engine
             if (keys.Space && player.isGrounded) {
                 player.velocity.y = player.jumpForce;
                 player.isGrounded = false;
             }
 
-            player.velocity.y -= 19.6 * delta; // Gravity
+            player.velocity.y -= 19.6 * delta;
 
-            // Proposed Motion Position
             const nextPos = player.position.clone();
             nextPos.x += player.velocity.x * delta;
             nextPos.y += player.velocity.y * delta;
             nextPos.z += player.velocity.z * delta;
 
-            // Ground Collision
             if (nextPos.y <= player.height) {
                 nextPos.y = player.height;
                 player.velocity.y = 0;
                 player.isGrounded = true;
             }
 
-            // Wall Collisions (Keep within castle boundaries)
-            const playerRadius = 0.6;
-            if (Math.abs(nextPos.x) > 63) nextPos.x = Math.sign(nextPos.x) * 63;
-            if (Math.abs(nextPos.z) > 63) nextPos.z = Math.sign(nextPos.z) * 63;
-
             player.position.copy(nextPos);
 
-            // Synchronize Camera with Player Position and Look Direction
             camera.position.copy(player.position);
             camera.rotation.copy(player.rotation);
 
-            // Animate Weapon Swing Arc
+            // Attack Animation Arc
             if (player.isAttacking) {
-                player.attackTime += delta * 8;
-                player.swordMesh.rotation.z = -Math.sin(player.attackTime) * 1.5;
-                player.swordMesh.rotation.x = Math.sin(player.attackTime) * 0.8;
+                player.attackTime += delta * 9;
+                player.swordMesh.rotation.z = -Math.sin(player.attackTime) * 1.6;
+                player.swordMesh.rotation.x = Math.sin(player.attackTime) * 0.9;
                 if (player.attackTime >= Math.PI) {
                     player.isAttacking = false;
-                    player.swordMesh.rotation.set(0.2, -0.3, 0);
+                    performBlock(player.isBlocking);
                 }
             }
 
-            // Dynamic Interaction Prompt Detection
-            const elderDist = player.position.distanceTo(npcs[0].position);
+            // Prompt state
             const prompt = document.getElementById('interaction-prompt');
-            if (elderDist < 4.0) {
-                prompt.classList.remove('hidden');
-            } else {
-                prompt.classList.add('hidden');
-            }
+            if (player.position.distanceTo(npcs[0].position) < 4.0) prompt.classList.remove('hidden');
+            else prompt.classList.add('hidden');
         }
 
         function updateCollectibles(delta) {
             collectibles.forEach(col => {
                 if (col.collected) return;
-
-                // Idle Rotation & Hover Animation
                 col.mesh.rotation.y += delta * 2;
-                col.mesh.position.y = 0.8 + Math.sin(clock.getElapsedTime() * 3) * 0.15;
-
-                // Proximity Collect Logic
                 if (player.position.distanceTo(col.mesh.position) < 1.8) {
                     col.collected = true;
                     scene.remove(col.mesh);
-                    scene.remove(col.light);
                     gameState.relics++;
-                    gameState.gold += 10;
-                    audio.playCoinPickup();
+                    gameState.gold += 15;
+                    audio.playPickup();
                     updateHUD();
-                    checkQuestProgress('relic');
                 }
             });
         }
@@ -1171,39 +890,24 @@
         function updateEnemies(delta) {
             enemies.forEach(enemy => {
                 if (!enemy.alive) return;
-
-                const distToPlayer = enemy.mesh.position.distanceTo(player.position);
-
-                // AI Aggro Behavior
-                if (distToPlayer < 18) {
-                    enemy.state = 'chase';
+                const dist = enemy.mesh.position.distanceTo(player.position);
+                if (dist < 18) {
                     const dir = new THREE.Vector3().subVectors(player.position, enemy.mesh.position);
-                    dir.y = 0;
-                    dir.normalize();
-
+                    dir.y = 0; dir.normalize();
                     enemy.mesh.position.addScaledVector(dir, enemy.speed * delta);
-                    enemy.mesh.lookAt(player.position.x, enemy.mesh.position.y, player.position.z);
 
-                    // Attack Player if within reach
-                    if (distToPlayer < 1.8 && clock.getElapsedTime() - enemy.lastAttack > 1.5) {
-                        gameState.health = Math.max(0, gameState.health - 15);
-                        audio.playHitSound();
+                    if (dist < 1.8 && clock.getElapsedTime() - enemy.lastAttack > 1.5) {
+                        if (player.isBlocking) {
+                            audio.playParry();
+                        } else {
+                            gameState.health = Math.max(0, gameState.health - 15);
+                            audio.playHit();
+                            updateHUD();
+                        }
                         enemy.lastAttack = clock.getElapsedTime();
-                        updateHUD();
                     }
                 }
             });
-        }
-
-        function updateParticles(delta) {
-            for (let i = particleEffects.length - 1; i >= 0; i--) {
-                const p = particleEffects[i];
-                p.life -= delta;
-                if (p.life <= 0) {
-                    scene.remove(p.mesh);
-                    particleEffects.splice(i, 1);
-                }
-            }
         }
 
         function updateHUD() {
@@ -1215,20 +919,9 @@
 
             document.getElementById('gold-count').textContent = gameState.gold;
             document.getElementById('relic-count').textContent = `${gameState.relics} / ${gameState.maxRelics}`;
-            document.getElementById('relic-inv-count').textContent = `Relics: ${gameState.relics}`;
-
-            if (gameState.relics > 0) {
-                document.getElementById('relic-inv-slot').classList.remove('opacity-50');
-            }
-
-            const activeQuest = gameState.quests[gameState.currentQuestIndex];
-            document.getElementById('quest-title').textContent = activeQuest.title;
-            document.getElementById('quest-desc').textContent = activeQuest.desc;
         }
 
         function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
 
@@ -1241,23 +934,20 @@
                 updatePlayer(delta);
                 updateCollectibles(delta);
                 updateEnemies(delta);
-                updateParticles(delta);
-
-                // Campfire Light Flicker Effect
-                if (campfireLight) {
-                    campfireLight.intensity = 2.2 + Math.sin(clock.getElapsedTime() * 10) * 0.4 + Math.random() * 0.2;
-                }
-
-                // Smoothly update stamina bar on HUD
                 updateHUD();
             }
 
+            // Render 3D Scene into Offscreen Low-Res Target ($384 \times 216$)
+            renderer.setRenderTarget(offscreenTarget);
             renderer.render(scene, camera);
+
+            // Blit Low-Res Texture onto Fullscreen Quad with Nearest-Neighbor Scaling
+            renderer.setRenderTarget(null);
+            renderer.render(virtualScene, new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1));
         }
 
-        // Initialize and trigger main loop on page load
         window.onload = function() {
-            initThree();
+            initEngine();
             setupControls();
             animate();
         };
