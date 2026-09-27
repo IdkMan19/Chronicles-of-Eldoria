@@ -190,11 +190,6 @@
                     <button id="mobile-jump" class="rpg-button w-12 h-12 rounded-full text-xs font-bold flex items-center justify-center">JUMP</button>
                 </div>
             </div>
-
-            <!-- Minimap Radar -->
-            <div class="rpg-panel p-1.5 pointer-events-auto relative rounded-full border-amber-500/40">
-                <canvas id="minimap-canvas" width="110" height="110" class="rounded-full bg-slate-950/80"></canvas>
-            </div>
         </div>
     </div>
 
@@ -1231,74 +1226,6 @@
             document.getElementById('quest-desc').textContent = activeQuest.desc;
         }
 
-        function drawMinimap() {
-            const canvas = document.getElementById('minimap-canvas');
-            const ctx = canvas.getContext('2d');
-            const size = canvas.width;
-            const center = size / 2;
-            const mapScale = 0.8;
-
-            ctx.clearRect(0, 0, size, size);
-
-            // Radar Outer Circle
-            ctx.fillStyle = '#0f172a';
-            ctx.beginPath();
-            ctx.arc(center, center, center - 2, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Draw Castle Perimeter Boundary
-            ctx.strokeStyle = '#475569';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(center - 50 * mapScale, center - 50 * mapScale, 100 * mapScale, 100 * mapScale);
-
-            // Draw NPCs (Yellow Dot)
-            npcs.forEach(npc => {
-                const x = center + (npc.position.x - player.position.x) * mapScale;
-                const y = center + (npc.position.z - player.position.z) * mapScale;
-                ctx.fillStyle = '#f59e0b';
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            // Draw Relics (Cyan Dots)
-            collectibles.forEach(col => {
-                if (!col.collected) {
-                    const x = center + (col.mesh.position.x - player.position.x) * mapScale;
-                    const y = center + (col.mesh.position.z - player.position.z) * mapScale;
-                    ctx.fillStyle = '#06b6d4';
-                    ctx.beginPath();
-                    ctx.arc(x, y, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-
-            // Draw Enemies (Red Dots)
-            enemies.forEach(enemy => {
-                if (enemy.alive) {
-                    const x = center + (enemy.mesh.position.x - player.position.x) * mapScale;
-                    const y = center + (enemy.mesh.position.z - player.position.z) * mapScale;
-                    ctx.fillStyle = '#ef4444';
-                    ctx.beginPath();
-                    ctx.arc(x, y, 3.5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            });
-
-            // Draw Player Marker Center (Green Triangle)
-            ctx.save();
-            ctx.translate(center, center);
-            ctx.rotate(-player.rotation.y);
-            ctx.fillStyle = '#10b981';
-            ctx.beginPath();
-            ctx.moveTo(0, -5);
-            ctx.lineTo(-4, 5);
-            ctx.lineTo(4, 5);
-            ctx.closePath();
-            ctx.fill();
-            ctx.restore();
-        }
-
         function onWindowResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
@@ -1323,7 +1250,6 @@
 
                 // Smoothly update stamina bar on HUD
                 updateHUD();
-                drawMinimap();
             }
 
             renderer.render(scene, camera);
