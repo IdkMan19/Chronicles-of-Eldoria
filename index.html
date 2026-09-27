@@ -26,14 +26,10 @@
             color: #e2e8f0;
             font-family: 'VT323', monospace;
         }
-        .font-cinzel {
-            font-family: 'Cinzel', serif;
-        }
-        .font-retro {
-            font-family: 'VT323', monospace;
-        }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .font-retro { font-family: 'VT323', monospace; }
 
-        /* CRISP NEAREST-NEIGHBOR PIXELATED RENDERING (Project Shadowglass Style) */
+        /* CRISP NEAREST-NEIGHBOR PIXELATED RENDERING (64-Bit Retro Engine) */
         canvas#game-canvas {
             display: block;
             width: 100vw;
@@ -61,17 +57,13 @@
             background: linear-gradient(180deg, #634b2b 0%, #3a2a14 100%);
             border-color: #fff;
         }
-        .retro-button:active {
-            transform: translateY(1px);
-        }
+        .retro-button:active { transform: translateY(1px); }
 
         /* Crosshair */
         #crosshair {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 12px;
-            height: 12px;
+            top: 50%; left: 50%;
+            width: 12px; height: 12px;
             transform: translate(-50%, -50%);
             pointer-events: none;
         }
@@ -84,7 +76,7 @@
         #crosshair::before { top: 5px; left: -6px; width: 24px; height: 2px; }
         #crosshair::after { top: -6px; left: 5px; width: 2px; height: 24px; }
 
-        /* CRT Vignette Scanline overlay */
+        /* CRT Scanline overlay */
         .crt-overlay {
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
             background-size: 100% 3px, 6px 100%;
@@ -105,7 +97,7 @@
 
     <!-- Retro HUD Overlay -->
     <div id="hud" class="absolute inset-0 pointer-events-none z-20 flex flex-col justify-between p-3 md:p-5">
-        <!-- Top Stats Row -->
+        <!-- Top Stats & Time Row -->
         <div class="flex justify-between items-start w-full gap-4">
             <!-- Health & Stamina Panel -->
             <div class="retro-panel p-3 min-w-[220px] md:min-w-[260px] pointer-events-auto">
@@ -135,9 +127,17 @@
                 </div>
             </div>
 
+            <!-- Time of Day & Realm Tracker -->
+            <div class="retro-panel px-4 py-2 flex flex-col items-center pointer-events-auto">
+                <div class="flex items-center gap-2">
+                    <span id="time-icon" class="text-lg">☀️</span>
+                    <span id="clock-display" class="font-cinzel text-amber-300 font-bold text-base tracking-widest">12:00 PM</span>
+                </div>
+                <div id="time-phase" class="text-xs text-amber-200/80 uppercase font-mono">Midday Sun</div>
+            </div>
+
             <!-- Quest & Currency Tracker -->
             <div class="flex flex-col items-end gap-2">
-                <!-- Counter Badges -->
                 <div class="retro-panel px-3 py-1.5 flex items-center gap-3 pointer-events-auto">
                     <div class="flex items-center gap-1">
                         <span class="text-sm">🪙</span>
@@ -150,14 +150,12 @@
                     </div>
                 </div>
 
-                <!-- Quest Tracker Container -->
                 <div class="retro-panel p-3 max-w-xs text-right pointer-events-auto">
                     <h3 class="font-cinzel text-xs font-bold text-amber-400 uppercase tracking-widest border-b border-amber-600/40 pb-0.5 mb-1">Active Quest</h3>
                     <p id="quest-title" class="text-base font-bold text-amber-100">Speak to Elder Bran</p>
-                    <p id="quest-desc" class="text-xs text-slate-300 leading-tight">Locate Elder Bran near the village central bonfire.</p>
+                    <p id="quest-desc" class="text-xs text-slate-300 leading-tight">Locate Elder Bran near the central bonfire.</p>
                 </div>
 
-                <!-- Audio Toggle & Controls -->
                 <div class="flex gap-2 pointer-events-auto">
                     <button id="btn-audio" class="retro-button px-2 py-1 text-xs font-bold">
                         <span id="audio-icon">🔊</span> AUDIO
@@ -180,9 +178,9 @@
                 <div><span class="text-amber-400 font-bold">WASD</span> Move</div>
                 <div><span class="text-amber-400 font-bold">SHIFT</span> Sprint</div>
                 <div><span class="text-amber-400 font-bold">SPACE</span> Jump</div>
-                <div><span class="text-amber-400 font-bold">L-CLICK</span> Attack (Combo Swings)</div>
-                <div><span class="text-amber-400 font-bold">R-CLICK</span> Block / Parry</div>
-                <div><span class="text-amber-400 font-bold">E</span> Interact</div>
+                <div><span class="text-amber-400 font-bold">L-CLICK</span> Attack</div>
+                <div><span class="text-amber-400 font-bold">R-CLICK</span> Parry</div>
+                <div><span class="text-amber-400 font-bold">E</span> Open Door / Interact</div>
             </div>
         </div>
     </div>
@@ -194,15 +192,15 @@
             <p class="text-sm font-retro text-amber-200 tracking-widest uppercase mb-4">64-Bit Retro Medieval Action RPG</p>
             
             <div class="text-left bg-black/60 p-3 border border-amber-900 text-xs text-slate-300 space-y-1.5 mb-5">
-                <p class="text-amber-300 font-bold border-b border-amber-800 pb-1">REALM ADVISORY:</p>
-                <p>• Low-resolution 64-bit pixelated rendering styled after Project Shadowglass.</p>
-                <p>• High-detail ornate longsword model with realistic multi-directional swing physics hinged at the wrist.</p>
-                <p>• Explore the coastal village, castle cliffs, and pine forests.</p>
-                <p>• Slash (<span class="text-amber-300">Left Click</span>) & Parry/Block (<span class="text-amber-300">Right Click</span>) dark knights & bandits.</p>
+                <p class="text-amber-300 font-bold border-b border-amber-800 pb-1">REALM ENHANCEMENTS & CONTROLS:</p>
+                <p>• <b>Dynamic 20-Min Day/Night Cycle:</b> Watch sun & moon orbits, sky color shifts, and twilight stars.</p>
+                <p>• <b>Openable Town House Interiors:</b> Approach wooden doors and press <span class="text-amber-300">[E]</span> to open and step inside fully detailed interiors with fireplaces, tables, and bed cots.</p>
+                <p>• <b>Full Collision Physics:</b> Complete sliding collision bounding across all walls, trees, rocks, fences, and structures.</p>
+                <p>• <b>Combat:</b> Swing with <span class="text-amber-300">Left Click</span>, Block with <span class="text-amber-300">Right Click</span>.</p>
             </div>
 
             <button id="btn-start" class="retro-button w-full py-3 text-xl font-cinzel font-bold tracking-widest">
-                ENTER THE SHADOWGLASS
+                ENTER THE REALM
             </button>
         </div>
     </div>
@@ -231,12 +229,14 @@
             constructor() {
                 this.ctx = null;
                 this.muted = false;
+                this.cricketGain = null;
             }
 
             init() {
                 if (!this.ctx) {
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
                     this.ctx = new AudioContext();
+                    this.setupCricketAmbience();
                 }
             }
 
@@ -264,11 +264,29 @@
                 osc.stop(this.ctx.currentTime + 0.32);
             }
 
+            playDoorSound(opening = true) {
+                if (this.muted || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(opening ? 90 : 140, now);
+                osc.frequency.exponentialRampToValueAtTime(opening ? 160 : 70, now + 0.35);
+
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            }
+
             playParry() {
                 if (this.muted || !this.ctx) return;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
-
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(1400, this.ctx.currentTime);
                 osc.frequency.exponentialRampToValueAtTime(450, this.ctx.currentTime + 0.25);
@@ -278,7 +296,6 @@
 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
-
                 osc.start();
                 osc.stop(this.ctx.currentTime + 0.25);
             }
@@ -292,7 +309,6 @@
 
                 const noise = this.ctx.createBufferSource();
                 noise.buffer = buffer;
-
                 const filter = this.ctx.createBiquadFilter();
                 filter.type = 'lowpass';
                 filter.frequency.setValueAtTime(600, this.ctx.currentTime);
@@ -304,7 +320,6 @@
                 noise.connect(filter);
                 filter.connect(gain);
                 gain.connect(this.ctx.destination);
-
                 noise.start();
             }
 
@@ -315,15 +330,14 @@
                 const gain = this.ctx.createGain();
 
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(784, now); // G5
-                osc.frequency.setValueAtTime(1046.5, now + 0.08); // C6
+                osc.frequency.setValueAtTime(784, now);
+                osc.frequency.setValueAtTime(1046.5, now + 0.08);
 
                 gain.gain.setValueAtTime(0.25, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
-
                 osc.start(now);
                 osc.stop(now + 0.25);
             }
@@ -341,9 +355,29 @@
 
                 osc.connect(gain);
                 gain.connect(this.ctx.destination);
-
                 osc.start();
                 osc.stop(this.ctx.currentTime + 0.06);
+            }
+
+            setupCricketAmbience() {
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(4500, this.ctx.currentTime);
+
+                this.cricketGain = this.ctx.createGain();
+                this.cricketGain.gain.setValueAtTime(0, this.ctx.currentTime);
+
+                osc.connect(this.cricketGain);
+                this.cricketGain.connect(this.ctx.destination);
+                osc.start();
+            }
+
+            updateNightAmbience(nightFactor) {
+                if (this.cricketGain && this.ctx) {
+                    this.cricketGain.gain.setValueAtTime(this.muted ? 0 : nightFactor * 0.03, this.ctx.currentTime);
+                }
             }
         }
 
@@ -361,6 +395,8 @@
             currentQuestIndex: 0,
             banditsDefeated: 0,
             requiredBandits: 3,
+            timeOfDay: 0.28, // Starts at 0.28 (approx 10:30 AM Morning)
+            dayDuration: 1200, // 20 minutes full cycle (1200s)
             quests: [
                 { title: "Speak to Elder Bran", desc: "Locate Elder Bran near the central bonfire." },
                 { title: "Collect Ancient Relics", desc: "Gather 5 glowing cyan relics around the village." },
@@ -369,28 +405,23 @@
             ]
         };
 
+        // --- PROCEDURAL TEXTURE GENERATOR FUNCTIONS ---
         function createSteelBladeTexture() {
             const canvas = document.createElement('canvas');
             canvas.width = 128; canvas.height = 128;
             const ctx = canvas.getContext('2d');
             const grad = ctx.createLinearGradient(0, 0, 128, 0);
-            grad.addColorStop(0, '#71717a');
-            grad.addColorStop(0.3, '#f4f4f5');
-            grad.addColorStop(0.5, '#e4e4e7');
-            grad.addColorStop(0.7, '#f4f4f5');
+            grad.addColorStop(0, '#71717a'); grad.addColorStop(0.3, '#f4f4f5');
+            grad.addColorStop(0.5, '#e4e4e7'); grad.addColorStop(0.7, '#f4f4f5');
             grad.addColorStop(1, '#52525b');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 128, 128);
+            ctx.fillStyle = grad; ctx.fillRect(0, 0, 128, 128);
 
-            // Micro notches & damascus grain lines
             ctx.fillStyle = 'rgba(24, 24, 27, 0.25)';
             for (let i = 0; i < 30; i++) {
-                const y = Math.floor(Math.random() * 128);
-                ctx.fillRect(0, y, 128, 1);
+                ctx.fillRect(0, Math.floor(Math.random() * 128), 128, 1);
             }
             const tex = new THREE.CanvasTexture(canvas);
-            tex.magFilter = THREE.NearestFilter;
-            tex.minFilter = THREE.NearestFilter;
+            tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
             return tex;
         }
 
@@ -400,18 +431,12 @@
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#291d18'; ctx.fillRect(0, 0, 64, 64);
             ctx.fillStyle = '#18100c';
-            for (let y = 0; y < 64; y += 8) {
-                ctx.fillRect(0, y, 64, 3);
-            }
+            for (let y = 0; y < 64; y += 8) ctx.fillRect(0, y, 64, 3);
             ctx.fillStyle = '#3d2b24';
-            for (let y = 4; y < 64; y += 8) {
-                ctx.fillRect(0, y, 64, 2);
-            }
+            for (let y = 4; y < 64; y += 8) ctx.fillRect(0, y, 64, 2);
             const tex = new THREE.CanvasTexture(canvas);
-            tex.magFilter = THREE.NearestFilter;
-            tex.minFilter = THREE.NearestFilter;
-            tex.wrapS = THREE.RepeatWrapping;
-            tex.wrapT = THREE.RepeatWrapping;
+            tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
+            tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
             return tex;
         }
 
@@ -433,10 +458,25 @@
                 }
             }
             const tex = new THREE.CanvasTexture(canvas);
-            tex.magFilter = THREE.NearestFilter;
-            tex.minFilter = THREE.NearestFilter;
-            tex.wrapS = THREE.RepeatWrapping;
-            tex.wrapT = THREE.RepeatWrapping;
+            tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
+            tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
+            return tex;
+        }
+
+        function createFloorboardTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#3d2817'; ctx.fillRect(0, 0, 64, 64);
+            ctx.fillStyle = '#24160a';
+            for (let y = 0; y < 64; y += 16) ctx.fillRect(0, y, 64, 2);
+            ctx.fillStyle = '#4e341f';
+            for (let x = 0; x < 64; x += 32) {
+                for (let y = 0; y < 64; y += 16) ctx.fillRect(x, y + 2, 30, 14);
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
+            tex.wrapS = THREE.RepeatWrapping; tex.wrapT = THREE.RepeatWrapping;
             return tex;
         }
 
@@ -445,46 +485,38 @@
             canvas.width = 64; canvas.height = 64;
             const ctx = canvas.getContext('2d');
             ctx.fillStyle = '#5c4d3c'; ctx.fillRect(0, 0, 64, 64);
-
             ctx.fillStyle = '#2a1e12';
-            ctx.fillRect(0, 0, 64, 8);
-            ctx.fillRect(0, 56, 64, 8);
-            ctx.fillRect(0, 0, 8, 64);
-            ctx.fillRect(56, 0, 8, 64);
+            ctx.fillRect(0, 0, 64, 8); ctx.fillRect(0, 56, 64, 8);
+            ctx.fillRect(0, 0, 8, 64); ctx.fillRect(56, 0, 8, 64);
 
             ctx.beginPath();
-            ctx.lineWidth = 6;
-            ctx.strokeStyle = '#2a1e12';
-            ctx.moveTo(8, 8); ctx.lineTo(56, 56);
-            ctx.stroke();
+            ctx.lineWidth = 6; ctx.strokeStyle = '#2a1e12';
+            ctx.moveTo(8, 8); ctx.lineTo(56, 56); ctx.stroke();
 
             const tex = new THREE.CanvasTexture(canvas);
-            tex.magFilter = THREE.NearestFilter;
-            tex.minFilter = THREE.NearestFilter;
+            tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
             return tex;
         }
 
-        function createRoofTileTexture() {
+        function createPlankDoorTexture() {
             const canvas = document.createElement('canvas');
-            canvas.width = 32; canvas.height = 32;
+            canvas.width = 64; canvas.height = 128;
             const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#7a221e'; ctx.fillRect(0, 0, 32, 32);
-            ctx.fillStyle = '#4a1210';
-            for (let y = 0; y < 32; y += 8) {
-                ctx.fillRect(0, y, 32, 2);
-            }
+            ctx.fillStyle = '#422812'; ctx.fillRect(0, 0, 64, 128);
+            ctx.fillStyle = '#1c1006';
+            for (let x = 0; x < 64; x += 16) ctx.fillRect(x, 0, 2, 128);
+            ctx.fillStyle = '#0f0a04';
+            ctx.fillRect(4, 8, 56, 8); ctx.fillRect(4, 112, 56, 8); ctx.fillRect(4, 60, 56, 8);
+            ctx.fillStyle = '#d4af37'; // Brass handle
+            ctx.fillRect(50, 64, 8, 12);
             const tex = new THREE.CanvasTexture(canvas);
-            tex.magFilter = THREE.NearestFilter;
-            tex.minFilter = THREE.NearestFilter;
-            tex.wrapS = THREE.RepeatWrapping;
-            tex.wrapT = THREE.RepeatWrapping;
+            tex.magFilter = THREE.NearestFilter; tex.minFilter = THREE.NearestFilter;
             return tex;
         }
 
         let scene, camera, renderer, offscreenTarget, virtualScene, quadMesh;
         let clock = new THREE.Clock();
 
-        // RETRO RENDER RESOLUTION (Project Shadowglass 64-bit crisp pixel scaling)
         const RENDER_WIDTH = 384;
         const RENDER_HEIGHT = 216;
 
@@ -492,12 +524,13 @@
             position: new THREE.Vector3(0, 1.6, 16),
             velocity: new THREE.Vector3(),
             rotation: new THREE.Euler(0, 0, 0, 'YXZ'),
+            radius: 0.45, // Physics collision cylinder radius
+            height: 1.6,
             isGrounded: true,
             isSprinting: false,
             speed: 6.5,
             sprintSpeed: 11.0,
             jumpForce: 7.0,
-            height: 1.6,
             weaponRig: null,
             wristPivot: null,
             armGroup: null,
@@ -507,7 +540,6 @@
             attackProgress: 0,
             comboIndex: 0,
             queuedAttack: false,
-            // Low Rest Position (natural viewing angles)
             idlePos: new THREE.Vector3(0.28, -0.38, -0.42),
             idleRot: new THREE.Euler(-0.35, 0.25, -0.15),
             targetPos: new THREE.Vector3(),
@@ -516,16 +548,22 @@
             currentRot: new THREE.Euler()
         };
 
+        // World Entity Containers
         const npcs = [];
         const enemies = [];
         const collectibles = [];
-        const environmentColliders = [];
+        const townDoors = [];
+        const streetLanterns = [];
+        const collisionBoxes = []; // AABB boxes for static collision
+        const collisionCylinders = []; // Radial cylinders for trees, pillars, NPCs
+
+        // Day/Night & Environment References
+        let sunLight, moonLight, ambientLight, hemiLight, starFieldMesh, skyDomeMesh;
 
         function initEngine() {
             const container = document.getElementById('canvas-container');
 
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x181424);
             scene.fog = new THREE.FogExp2(0x181424, 0.015);
 
             camera = new THREE.PerspectiveCamera(72, RENDER_WIDTH / RENDER_HEIGHT, 0.05, 300);
@@ -547,16 +585,7 @@
             quadMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), quadMat);
             virtualScene.add(quadMesh);
 
-            const ambient = new THREE.AmbientLight(0xc7d2fe, 0.55);
-            scene.add(ambient);
-
-            const sun = new THREE.DirectionalLight(0xffedd5, 1.3);
-            sun.position.set(45, 60, -30);
-            scene.add(sun);
-
-            const hemi = new THREE.HemisphereLight(0xfde047, 0x1e1b4b, 0.4);
-            scene.add(hemi);
-
+            setupDayNightLighting();
             buildShadowglassWorld();
             setupHighDetailFirstPersonWeapon();
             spawnEntities();
@@ -564,31 +593,103 @@
             window.addEventListener('resize', onWindowResize);
         }
 
+        function setupDayNightLighting() {
+            ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+
+            hemiLight = new THREE.HemisphereLight(0xffffff, 0x111122, 0.4);
+            scene.add(hemiLight);
+
+            sunLight = new THREE.DirectionalLight(0xfffaed, 1.4);
+            scene.add(sunLight);
+
+            moonLight = new THREE.DirectionalLight(0x7dd3fc, 0.35);
+            scene.add(moonLight);
+
+            // Night Twinkling Star Field
+            const starGeo = new THREE.BufferGeometry();
+            const starPos = [];
+            for (let i = 0; i < 600; i++) {
+                const u = Math.random(); const v = Math.random();
+                const theta = u * Math.PI * 2; const phi = Math.acos(2 * v - 1);
+                const r = 240;
+                starPos.push(r * Math.sin(phi) * Math.cos(theta), Math.abs(r * Math.cos(phi)) + 10, r * Math.sin(phi) * Math.sin(theta));
+            }
+            starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+            const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.2, transparent: true, opacity: 0 });
+            starFieldMesh = new THREE.Points(starGeo, starMat);
+            scene.add(starFieldMesh);
+        }
+
         function buildShadowglassWorld() {
+            // Ground Cobblestone
             const cobbleTex = createCobblestoneTexture();
-            cobbleTex.repeat.set(20, 20);
+            cobbleTex.repeat.set(24, 24);
             const groundGeo = new THREE.PlaneGeometry(160, 160);
             const groundMat = new THREE.MeshStandardMaterial({ map: cobbleTex, roughness: 0.9 });
             const ground = new THREE.Mesh(groundGeo, groundMat);
             ground.rotation.x = -Math.PI / 2;
             scene.add(ground);
 
+            // Castle & Cliffs at North Boundary
             buildCastleOnCliffs(0, 0, -55);
-            buildCottage(-14, 0, -10, 0.3);
-            buildCottage(14, 0, -12, -0.4);
-            buildCottage(-16, 0, 10, 1.2);
 
-            for (let i = 0; i < 40; i++) {
+            // Interactive Town Cottages with Full Detailed Interiors & Windows
+            buildDetailedTownHouse(-14, 0, -10, 0, "Cottage North");
+            buildDetailedTownHouse(14, 0, -12, Math.PI, "Cottage East");
+            buildDetailedTownHouse(-16, 0, 10, Math.PI / 2, "Cottage West");
+
+            // Pine Trees & Boulders with Cylindrical Physics Collision
+            for (let i = 0; i < 35; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const dist = 20 + Math.random() * 45;
+                const dist = 22 + Math.random() * 45;
                 const x = Math.cos(angle) * dist;
                 const z = Math.sin(angle) * dist;
                 if (z > -40) buildRetroPineTree(x, 0, z);
             }
 
-            const fireLight = new THREE.PointLight(0xf97316, 2.5, 20);
-            fireLight.position.set(0, 1.2, 0);
+            for (let i = 0; i < 12; i++) {
+                const x = (Math.random() - 0.5) * 70;
+                const z = (Math.random() - 0.5) * 70;
+                if (Math.hypot(x, z) > 12) buildBoulder(x, 0, z);
+            }
+
+            // Central Village Bonfire
+            const fireGeo = new THREE.CylinderGeometry(0.8, 1.0, 0.4, 8);
+            const firePit = new THREE.Mesh(fireGeo, new THREE.MeshStandardMaterial({ color: 0x222222 }));
+            firePit.position.set(0, 0.2, 0);
+            scene.add(firePit);
+            collisionCylinders.push({ x: 0, z: 0, radius: 1.1 });
+
+            const fireLight = new THREE.PointLight(0xf97316, 3.0, 22);
+            fireLight.position.set(0, 1.4, 0);
             scene.add(fireLight);
+            streetLanterns.push(fireLight);
+
+            // Street Lamp Posts
+            buildStreetLamp(5, 0, 8);
+            buildStreetLamp(-5, 0, -4);
+            buildStreetLamp(8, 0, -22);
+        }
+
+        function buildStreetLamp(x, y, z) {
+            const group = new THREE.Group();
+            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.1, 3.2, 6), new THREE.MeshStandardMaterial({ color: 0x1e293b }));
+            pole.position.y = 1.6;
+            group.add(pole);
+
+            const lantern = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.5, 0.4), new THREE.MeshStandardMaterial({ color: 0xd4af37, emissive: 0xf59e0b, emissiveIntensity: 0.8 }));
+            lantern.position.y = 3.2;
+            group.add(lantern);
+
+            const pLight = new THREE.PointLight(0xf59e0b, 2.0, 14);
+            pLight.position.set(x, 3.2, z);
+            scene.add(pLight);
+            streetLanterns.push(pLight);
+
+            group.position.set(x, y, z);
+            scene.add(group);
+            collisionCylinders.push({ x, z, radius: 0.35 });
         }
 
         function buildCastleOnCliffs(x, y, z) {
@@ -603,229 +704,226 @@
             keep.position.set(0, 30, -5);
             castle.add(keep);
 
-            const spire = new THREE.Mesh(new THREE.CylinderGeometry(4, 6, 40, 8), stoneMat);
-            spire.position.set(0, 50, -5);
-            castle.add(spire);
-
-            const coneRoof = new THREE.Mesh(new THREE.ConeGeometry(5, 16, 8), new THREE.MeshStandardMaterial({ color: 0x1e1b4b }));
-            coneRoof.position.set(0, 78, -5);
-            castle.add(coneRoof);
-
             castle.position.set(x, y, z);
             scene.add(castle);
+
+            // Add AABB Bounding Box Collision for Castle Cliff Face
+            collisionBoxes.push(new THREE.Box3(new THREE.Vector3(-35 + x, 0, -20 + z), new THREE.Vector3(35 + x, 30, 20 + z)));
         }
 
-        function buildCottage(x, y, z, rot) {
-            const cottage = new THREE.Group();
+        function buildDetailedTownHouse(x, y, z, rotationY, houseName) {
+            const house = new THREE.Group();
             const wallMat = new THREE.MeshStandardMaterial({ map: createTimberWallTexture(), roughness: 0.8 });
-            const body = new THREE.Mesh(new THREE.BoxGeometry(6, 4.5, 5), wallMat);
-            body.position.y = 2.25;
-            cottage.add(body);
+            const floorMat = new THREE.MeshStandardMaterial({ map: createFloorboardTexture(), roughness: 0.7 });
+            const glassMat = new THREE.MeshStandardMaterial({
+                color: 0x38bdf8, transparent: true, opacity: 0.45, roughness: 0.1, metalness: 0.9
+            });
 
-            const roofTex = createRoofTileTexture();
-            roofTex.repeat.set(2, 2);
-            const roofMat = new THREE.MeshStandardMaterial({ map: roofTex, roughness: 0.6 });
-            const roof = new THREE.Mesh(new THREE.ConeGeometry(4.8, 3, 4), roofMat);
-            roof.position.y = 5.75;
+            const width = 8, height = 5, depth = 7;
+            const wallThick = 0.3;
+
+            // 1. Interior Floorboards
+            const floor = new THREE.Mesh(new THREE.PlaneGeometry(width - 0.2, depth - 0.2), floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.set(0, 0.02, 0);
+            house.add(floor);
+
+            // 2. Exterior Hollow Walls with Doorway Cutout
+            // Back Wall
+            const backWall = new THREE.Mesh(new THREE.BoxGeometry(width, height, wallThick), wallMat);
+            backWall.position.set(0, height / 2, -depth / 2);
+            house.add(backWall);
+
+            // Left & Right Side Walls
+            const leftWall = new THREE.Mesh(new THREE.BoxGeometry(wallThick, height, depth), wallMat);
+            leftWall.position.set(-width / 2, height / 2, 0);
+            house.add(leftWall);
+
+            const rightWall = new THREE.Mesh(new THREE.BoxGeometry(wallThick, height, depth), wallMat);
+            rightWall.position.set(width / 2, height / 2, 0);
+            house.add(rightWall);
+
+            // Front Wall with Doorway Split (Left segment, Right segment, Lintle top)
+            const doorWidth = 1.8;
+            const sideSegmentWidth = (width - doorWidth) / 2;
+
+            const frontLeft = new THREE.Mesh(new THREE.BoxGeometry(sideSegmentWidth, height, wallThick), wallMat);
+            frontLeft.position.set(-width / 2 + sideSegmentWidth / 2, height / 2, depth / 2);
+            house.add(frontLeft);
+
+            const frontRight = new THREE.Mesh(new THREE.BoxGeometry(sideSegmentWidth, height, wallThick), wallMat);
+            frontRight.position.set(width / 2 - sideSegmentWidth / 2, height / 2, depth / 2);
+            house.add(frontRight);
+
+            const doorTop = new THREE.Mesh(new THREE.BoxGeometry(doorWidth, height - 3.2, wallThick), wallMat);
+            doorTop.position.set(0, height - (height - 3.2) / 2, depth / 2);
+            house.add(doorTop);
+
+            // 3. Glinting Tinted Glass Windows
+            const windowGeo = new THREE.PlaneGeometry(1.2, 1.4);
+            const winLeft = new THREE.Mesh(windowGeo, glassMat);
+            winLeft.position.set(-width / 2 - 0.01, 2.4, 0);
+            winLeft.rotation.y = -Math.PI / 2;
+            house.add(winLeft);
+
+            const winRight = new THREE.Mesh(windowGeo, glassMat);
+            winRight.position.set(width / 2 + 0.01, 2.4, 0);
+            winRight.rotation.y = Math.PI / 2;
+            house.add(winRight);
+
+            // 4. Roof Assembly
+            const roof = new THREE.Mesh(new THREE.ConeGeometry(width * 0.75, 3.2, 4), new THREE.MeshStandardMaterial({ color: 0x7a221e, roughness: 0.6 }));
+            roof.position.y = height + 1.6;
             roof.rotation.y = Math.PI / 4;
-            cottage.add(roof);
+            house.add(roof);
 
-            cottage.position.set(x, y, z);
-            cottage.rotation.y = rot;
-            scene.add(cottage);
+            // 5. Openable Interactive Door with Hinge Pivot
+            const doorPivot = new THREE.Group();
+            doorPivot.position.set(-doorWidth / 2, 0, depth / 2); // Hinge on left jamb
 
-            environmentColliders.push(new THREE.Box3().setFromObject(cottage));
+            const doorMesh = new THREE.Mesh(new THREE.BoxGeometry(doorWidth, 3.2, 0.12), new THREE.MeshStandardMaterial({ map: createPlankDoorTexture() }));
+            doorMesh.position.set(doorWidth / 2, 1.6, 0);
+            doorPivot.add(doorMesh);
+            house.add(doorPivot);
+
+            // 6. Detailed Interior Furnishings
+            // Stone Fireplace & Glowing Hearth
+            const hearthMat = new THREE.MeshStandardMaterial({ color: 0x1f2937 });
+            const hearth = new THREE.Mesh(new THREE.BoxGeometry(1.8, 2.2, 1.0), hearthMat);
+            hearth.position.set(-width / 2 + 1.1, 1.1, -depth / 2 + 0.8);
+            house.add(hearth);
+
+            const hearthLight = new THREE.PointLight(0xf97316, 1.8, 8);
+            hearthLight.position.set(-width / 2 + 1.1, 0.8, -depth / 2 + 1.2);
+            house.add(hearthLight);
+            streetLanterns.push(hearthLight);
+
+            // Dining Table & Chairs
+            const tableMat = new THREE.MeshStandardMaterial({ color: 0x3f2e21 });
+            const table = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.0, 1.2), tableMat);
+            table.position.set(1.2, 0.5, -0.5);
+            house.add(table);
+
+            const chair1 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.5), tableMat);
+            chair1.position.set(1.2, 0.3, 0.4);
+            house.add(chair1);
+
+            // Wooden Bed Cot
+            const bed = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 2.6), new THREE.MeshStandardMaterial({ color: 0x1e3a8a }));
+            bed.position.set(width / 2 - 1.2, 0.25, -depth / 2 + 1.6);
+            house.add(bed);
+
+            // Transform house group
+            house.position.set(x, y, z);
+            house.rotation.y = rotationY;
+            scene.add(house);
+
+            // Register Door Entity for Interaction
+            const doorWorldPos = new THREE.Vector3(0, 0, depth / 2).applyAxisAngle(new THREE.Vector3(0, 1, 0), rotationY).add(new THREE.Vector3(x, y, z));
+            townDoors.push({
+                pivot: doorPivot,
+                position: doorWorldPos,
+                isOpen: false,
+                targetAngle: 0,
+                currentAngle: 0
+            });
+
+            // Register Bounding Box Collisions (Outer walls with door opening gap)
+            // Compute transformed bounding boxes for solid walls
+            const houseBox = new THREE.Box3().setFromObject(house);
+            // Register house interior collision walls
+            collisionBoxes.push(new THREE.Box3(new THREE.Vector3(-width / 2 + x, y, -depth / 2 + z - 0.2), new THREE.Vector3(-width / 2 + x + 0.4, y + height, depth / 2 + z)));
+            collisionBoxes.push(new THREE.Box3(new THREE.Vector3(width / 2 + x - 0.4, y, -depth / 2 + z - 0.2), new THREE.Vector3(width / 2 + x, y + height, depth / 2 + z)));
+            collisionBoxes.push(new THREE.Box3(new THREE.Vector3(-width / 2 + x, y, -depth / 2 + z - 0.4), new THREE.Vector3(width / 2 + x, y + height, -depth / 2 + z + 0.4)));
         }
 
         function buildRetroPineTree(x, y, z) {
             const tree = new THREE.Group();
-            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.5, 3, 6), new THREE.MeshStandardMaterial({ color: 0x271a0c }));
-            trunk.position.y = 1.5;
+            const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 3.2, 6), new THREE.MeshStandardMaterial({ color: 0x271a0c }));
+            trunk.position.y = 1.6;
             tree.add(trunk);
 
             const pineMat = new THREE.MeshStandardMaterial({ color: 0x143519, roughness: 0.7, flatShading: true });
             for (let i = 0; i < 3; i++) {
-                const cone = new THREE.Mesh(new THREE.ConeGeometry(2.5 - i * 0.5, 3, 6), pineMat);
-                cone.position.y = 3 + i * 1.6;
+                const cone = new THREE.Mesh(new THREE.ConeGeometry(2.6 - i * 0.5, 3.2, 6), pineMat);
+                cone.position.y = 3.2 + i * 1.8;
                 tree.add(cone);
             }
             tree.position.set(x, y, z);
             scene.add(tree);
+
+            collisionCylinders.push({ x, z, radius: 0.6 });
+        }
+
+        function buildBoulder(x, y, z) {
+            const rock = new THREE.Mesh(new THREE.DodecahedronGeometry(1.2 + Math.random() * 0.6), new THREE.MeshStandardMaterial({ color: 0x4b5563, roughness: 0.9 }));
+            rock.position.set(x, 0.8, z);
+            scene.add(rock);
+
+            collisionCylinders.push({ x, z, radius: 1.2 });
         }
 
         function setupHighDetailFirstPersonWeapon() {
-            // Main Root Rig Attached to FPS Camera
             const mainRig = new THREE.Group();
 
-            // Wrist Pivot Joint (Key Rotation & Swing Dynamics)
             const wristPivot = new THREE.Group();
             wristPivot.position.set(0.24, -0.32, -0.38);
             mainRig.add(wristPivot);
 
-            // Detailed Knightly Gauntlet & Vambrace Sleeve
             const armGroup = new THREE.Group();
-            const steelMat = new THREE.MeshStandardMaterial({
-                map: createSteelBladeTexture(),
-                metalness: 0.85,
-                roughness: 0.25
-            });
+            const steelMat = new THREE.MeshStandardMaterial({ map: createSteelBladeTexture(), metalness: 0.85, roughness: 0.25 });
             const brassMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, metalness: 0.8, roughness: 0.3 });
             const darkLeatherMat = new THREE.MeshStandardMaterial({ map: createLeatherGripTexture(), roughness: 0.85 });
 
-            // Vambrace Forearm Sleeve Guard
-            const vambraceGeo = new THREE.CylinderGeometry(0.065, 0.05, 0.45, 10);
-            const vambrace = new THREE.Mesh(vambraceGeo, steelMat);
+            // Vambrace Forearm
+            const vambrace = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.05, 0.45, 10), steelMat);
             vambrace.position.set(0.02, -0.05, 0.22);
             vambrace.rotation.x = Math.PI / 2.2;
             armGroup.add(vambrace);
 
-            // Vambrace Brass Trim Bands
-            const trimBand = new THREE.Mesh(new THREE.TorusGeometry(0.062, 0.008, 6, 12), brassMat);
-            trimBand.position.set(0.02, -0.05, 0.12);
-            trimBand.rotation.x = Math.PI / 2.2;
-            armGroup.add(trimBand);
-
-            // Wrist Joint Leather Straps
-            const wristCuff = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.055, 0.08, 8), darkLeatherMat);
-            wristCuff.position.set(0.0, 0.0, 0.03);
-            wristCuff.rotation.x = Math.PI / 2;
-            armGroup.add(wristCuff);
-
-            // Articulated Gauntlet Hand & Fingers
+            // Gauntlet Palm & Knuckles
             const palm = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.09), steelMat);
             palm.position.set(0, 0, -0.04);
             armGroup.add(palm);
 
-            // Brass Knuckle Rivet Bar
             const knuckles = new THREE.Mesh(new THREE.BoxGeometry(0.085, 0.02, 0.025), brassMat);
             knuckles.position.set(0, 0.02, -0.07);
             armGroup.add(knuckles);
 
-            // Wrapped Finger Segments Around Hilt
-            for (let f = 0; f < 4; f++) {
-                const fingerScale = new THREE.Group();
-                const scaleMesh = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.035, 0.05), steelMat);
-                fingerScale.add(scaleMesh);
-                fingerScale.position.set(-0.03 + f * 0.02, -0.015, -0.08 - (f * 0.005));
-                fingerScale.rotation.x = 0.8;
-                armGroup.add(fingerScale);
-            }
-
-            // Thumb Plate
-            const thumb = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.04, 0.025), steelMat);
-            thumb.position.set(-0.045, 0.02, -0.04);
-            thumb.rotation.set(0.3, 0.4, -0.5);
-            armGroup.add(thumb);
-
-            // EXTREMELY HIGH DETAIL ORNATE SWORD
+            // Sword Assembly
             const swordGroup = new THREE.Group();
-
-            // Dual-Beveled Sculpted Diamond-Cross-Section Steel Blade
             const bladeLen = 1.25;
 
-            // Blade Base Ricasso
-            const ricassoMat = new THREE.MeshStandardMaterial({ color: 0x111115, metalness: 0.9, roughness: 0.2 });
-            const ricasso = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.08, 0.022), ricassoMat);
-            ricasso.position.y = 0.04;
-            swordGroup.add(ricasso);
-
-            // Ricasso Filigree Gold Inlays
-            const inlay1 = new THREE.Mesh(new THREE.BoxGeometry(0.025, 0.06, 0.024), brassMat);
-            inlay1.position.y = 0.04;
-            swordGroup.add(inlay1);
-
-            // Sculpted Blade Bevel Facets
+            // Dual Bevel Blade
             const bladeBevelLeft = new THREE.Mesh(new THREE.BoxGeometry(0.026, bladeLen, 0.018), steelMat);
             bladeBevelLeft.position.set(-0.014, bladeLen / 2 + 0.08, 0);
-            bladeBevelLeft.rotation.z = -0.01;
             swordGroup.add(bladeBevelLeft);
 
             const bladeBevelRight = new THREE.Mesh(new THREE.BoxGeometry(0.026, bladeLen, 0.018), steelMat);
             bladeBevelRight.position.set(0.014, bladeLen / 2 + 0.08, 0);
-            bladeBevelRight.rotation.z = 0.01;
             swordGroup.add(bladeBevelRight);
 
-            // Inlaid Glowing Fuller Channel (Runic Groove)
-            const fullerGeo = new THREE.BoxGeometry(0.012, bladeLen * 0.72, 0.012);
+            // Runic Glowing Fuller
             const fullerMat = new THREE.MeshStandardMaterial({ color: 0x06b6d4, emissive: 0x0891b2, emissiveIntensity: 0.9 });
-            const fuller = new THREE.Mesh(fullerGeo, fullerMat);
+            const fuller = new THREE.Mesh(new THREE.BoxGeometry(0.012, bladeLen * 0.72, 0.012), fullerMat);
             fuller.position.y = bladeLen * 0.42 + 0.08;
             swordGroup.add(fuller);
 
-            // Tapered Sharp Sword Tip
-            const tipGeo = new THREE.ConeGeometry(0.028, 0.18, 4);
-            const tip = new THREE.Mesh(tipGeo, steelMat);
-            tip.position.y = bladeLen + 0.12;
-            tip.rotation.y = Math.PI / 4;
-            swordGroup.add(tip);
+            // Crossguard & Hilt
+            const guard = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.03, 0.04), brassMat);
+            swordGroup.add(guard);
 
-            // Ornamental Forged Crossguard with Quillons and Rain-Guard (Chappe)
-            const guardGroup = new THREE.Group();
-            const centerGuard = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.04, 0.05), brassMat);
-            guardGroup.add(centerGuard);
+            const hilt = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.22, 8), darkLeatherMat);
+            hilt.position.y = -0.11;
+            swordGroup.add(hilt);
 
-            // Curved Left Quillon with Spiral Tip
-            const quillonL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.025, 0.03), brassMat);
-            quillonL.position.set(-0.11, 0.01, 0);
-            quillonL.rotation.z = -0.15;
-            guardGroup.add(quillonL);
+            const pommel = new THREE.Mesh(new THREE.OctahedronGeometry(0.035), brassMat);
+            pommel.position.y = -0.24;
+            swordGroup.add(pommel);
 
-            const tipL = new THREE.Mesh(new THREE.SphereGeometry(0.02, 6, 6), brassMat);
-            tipL.position.set(-0.19, 0.025, 0);
-            guardGroup.add(tipL);
-
-            // Curved Right Quillon with Spiral Tip
-            const quillonR = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.025, 0.03), brassMat);
-            quillonR.position.set(0.11, 0.01, 0);
-            quillonR.rotation.z = 0.15;
-            guardGroup.add(quillonR);
-
-            const tipR = new THREE.Mesh(new THREE.SphereGeometry(0.02, 6, 6), brassMat);
-            tipR.position.set(0.19, 0.025, 0);
-            guardGroup.add(tipR);
-
-            // Rain-Guard (Chappe) Overlapping Ricasso
-            const chappe = new THREE.Mesh(new THREE.ConeGeometry(0.048, 0.05, 4), darkLeatherMat);
-            chappe.position.y = 0.022;
-            chappe.rotation.y = Math.PI / 4;
-            chappe.rotation.x = Math.PI;
-            guardGroup.add(chappe);
-
-            swordGroup.add(guardGroup);
-
-            // Multi-Wrap Leather Handle Hilt with Metallic Wire Bindings
-            const hiltGroup = new THREE.Group();
-            const hiltCore = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.02, 0.22, 8), darkLeatherMat);
-            hiltCore.position.y = -0.11;
-            hiltGroup.add(hiltCore);
-
-            // Wire Wrap Bindings
-            for (let w = 0; w < 6; w++) {
-                const wire = new THREE.Mesh(new THREE.TorusGeometry(0.021, 0.003, 4, 10), brassMat);
-                wire.position.y = -0.03 - (w * 0.032);
-                wire.rotation.x = Math.PI / 2;
-                hiltGroup.add(wire);
-            }
-
-            // Octagonal Pommel with Polished Ruby Facet
-            const pommelBase = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.025, 0.05, 8), brassMat);
-            pommelBase.position.y = -0.24;
-            hiltGroup.add(pommelBase);
-
-            const rubyGeo = new THREE.OctahedronGeometry(0.02);
-            const rubyMat = new THREE.MeshStandardMaterial({ color: 0xe11d48, emissive: 0xbe123c, emissiveIntensity: 0.8, roughness: 0.1 });
-            const ruby = new THREE.Mesh(rubyGeo, rubyMat);
-            ruby.position.y = -0.24;
-            ruby.position.z = 0.018;
-            hiltGroup.add(ruby);
-
-            swordGroup.add(hiltGroup);
-
-            // Attach Sword and Gauntlet Arm to Wrist Joint Pivot
             wristPivot.add(armGroup);
             wristPivot.add(swordGroup);
 
-            // Attach Rig to FPS Camera
             camera.add(mainRig);
             scene.add(camera);
 
@@ -834,7 +932,6 @@
             player.armGroup = armGroup;
             player.swordMesh = swordGroup;
 
-            // Initialize Current Views
             player.currentPos.copy(player.idlePos);
             player.currentRot.copy(player.idleRot);
             player.wristPivot.position.copy(player.currentPos);
@@ -842,20 +939,15 @@
         }
 
         function spawnEntities() {
-            // Elder Bran NPC
+            // Elder Bran
             const npcGroup = new THREE.Group();
             const body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.45, 1.6, 8), new THREE.MeshStandardMaterial({ color: 0x1e3a8a }));
             body.position.y = 0.8;
             npcGroup.add(body);
-
-            const head = new THREE.Mesh(new THREE.SphereGeometry(0.25, 8, 8), new THREE.MeshStandardMaterial({ color: 0xfde047 }));
-            head.position.y = 1.7;
-            npcGroup.add(head);
-
             npcGroup.position.set(3, 0, 3);
             scene.add(npcGroup);
-
             npcs.push({ name: "Elder Bran", position: npcGroup.position });
+            collisionCylinders.push({ x: 3, z: 3, radius: 0.6 });
 
             // Relics
             const relicGeo = new THREE.OctahedronGeometry(0.35);
@@ -869,14 +961,13 @@
                 collectibles.push({ mesh, collected: false });
             });
 
-            // Bandits / Dark Knights near Castle Cliffs
+            // Bandits
             const enemyPos = [new THREE.Vector3(-25, 0, -35), new THREE.Vector3(0, 0, -40), new THREE.Vector3(25, 0, -35)];
             enemyPos.forEach((pos, i) => {
                 const group = new THREE.Group();
                 const bBody = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.5, 1.7, 8), new THREE.MeshStandardMaterial({ color: 0x450a0a }));
                 bBody.position.y = 0.85;
                 group.add(bBody);
-
                 group.position.copy(pos);
                 scene.add(group);
 
@@ -918,8 +1009,8 @@
 
             window.addEventListener('mousedown', (e) => {
                 if (!isPointerLocked) return;
-                if (e.button === 0) performAttack(); // Left Click Dynamic Combo
-                if (e.button === 2) performBlock(true); // Right Click Parrying Guard
+                if (e.button === 0) performAttack();
+                if (e.button === 2) performBlock(true);
             });
 
             window.addEventListener('mouseup', (e) => {
@@ -945,57 +1036,22 @@
             document.body.requestPointerLock();
         }
 
-        // --- REALISTIC SLOW 4-DIRECTIONAL WRIST-PIVOT SWINGS ---
+        // Sword Swing Variations
         const comboAttacks = [
-            // 0: Heavy Overhead Chop
-            {
-                startPos: new THREE.Vector3(0.08, 0.22, -0.30),
-                startRot: new THREE.Euler(0.70, -0.25, 0.40),
-                peakPos: new THREE.Vector3(-0.05, -0.28, -0.32),
-                peakRot: new THREE.Euler(-0.85, 0.35, -0.50),
-                soundPitch: 0.95
-            },
-            // 1: Horizontal Cross Sweep
-            {
-                startPos: new THREE.Vector3(0.32, 0.05, -0.28),
-                startRot: new THREE.Euler(0.15, -0.90, 0.70),
-                peakPos: new THREE.Vector3(-0.35, -0.12, -0.30),
-                peakRot: new THREE.Euler(-0.25, 1.10, -0.85),
-                soundPitch: 1.1
-            },
-            // 2: Rising Underhand Slash
-            {
-                startPos: new THREE.Vector3(-0.28, -0.32, -0.30),
-                startRot: new THREE.Euler(-0.60, 0.80, -0.70),
-                peakPos: new THREE.Vector3(0.22, 0.25, -0.28),
-                peakRot: new THREE.Euler(0.75, -0.65, 0.60),
-                soundPitch: 1.05
-            },
-            // 3: Diagonal Cleave
-            {
-                startPos: new THREE.Vector3(-0.18, 0.28, -0.32),
-                startRot: new THREE.Euler(0.85, 0.55, -0.65),
-                peakPos: new THREE.Vector3(0.26, -0.25, -0.28),
-                peakRot: new THREE.Euler(-0.65, -0.45, 0.75),
-                soundPitch: 0.90
-            }
+            { startPos: new THREE.Vector3(0.08, 0.22, -0.30), startRot: new THREE.Euler(0.70, -0.25, 0.40), peakPos: new THREE.Vector3(-0.05, -0.28, -0.32), peakRot: new THREE.Euler(-0.85, 0.35, -0.50), soundPitch: 0.95 },
+            { startPos: new THREE.Vector3(0.32, 0.05, -0.28), startRot: new THREE.Euler(0.15, -0.90, 0.70), peakPos: new THREE.Vector3(-0.35, -0.12, -0.30), peakRot: new THREE.Euler(-0.25, 1.10, -0.85), soundPitch: 1.1 },
+            { startPos: new THREE.Vector3(-0.28, -0.32, -0.30), startRot: new THREE.Euler(-0.60, 0.80, -0.70), peakPos: new THREE.Vector3(0.22, 0.25, -0.28), peakRot: new THREE.Euler(0.75, -0.65, 0.60), soundPitch: 1.05 }
         ];
 
         function performAttack() {
             if (player.isBlocking) return;
-
-            if (player.isAttacking) {
-                // Queue next fluid combo attack
-                player.queuedAttack = true;
-                return;
-            }
+            if (player.isAttacking) { player.queuedAttack = true; return; }
 
             player.isAttacking = true;
             player.attackProgress = 0;
             const atk = comboAttacks[player.comboIndex];
             audio.playSwordSwing(atk.soundPitch);
 
-            // Raycast Melee Hit Detection at Mid-Swing
             setTimeout(() => {
                 const ray = new THREE.Raycaster();
                 ray.setFromCamera(new THREE.Vector2(0, 0), camera);
@@ -1016,35 +1072,41 @@
                         }
                     }
                 }
-            }, 260); // Aligned to heavy slow swing peak velocity
+            }, 240);
         }
 
-        function performBlock(blocking) {
-            player.isBlocking = blocking;
-        }
+        function performBlock(blocking) { player.isBlocking = blocking; }
 
         function handleInteraction() {
+            // Check Town Doors for opening/closing
+            for (let door of townDoors) {
+                if (player.position.distanceTo(door.position) < 2.6) {
+                    door.isOpen = !door.isOpen;
+                    door.targetAngle = door.isOpen ? Math.PI / 2.2 : 0;
+                    audio.playDoorSound(door.isOpen);
+                    return;
+                }
+            }
+
+            // Check NPC Dialogue
             if (player.position.distanceTo(npcs[0].position) < 4.0) {
                 const modal = document.getElementById('dialogue-modal');
                 document.getElementById('npc-name').textContent = "Elder Bran";
-                document.getElementById('npc-dialogue-text').textContent = "Traveler! Gather the 5 Mystic Relics around the village cottages, then vanquish the rogue bandits near the castle cliffs!";
+                document.getElementById('npc-dialogue-text').textContent = "Greetings, Paladin! You may now open town house doors [E] to seek shelter, collect the 5 relics, and slay the cliff bandits!";
                 modal.classList.remove('hidden');
             }
         }
 
         let footstepTimer = 0;
 
-        function updatePlayer(delta) {
+        function updatePlayerPhysics(delta) {
             if (!gameState.started) return;
 
             player.isSprinting = keys.ShiftLeft && gameState.stamina > 5;
             const moveSpeed = player.isSprinting ? player.sprintSpeed : player.speed;
 
-            if (player.isSprinting) {
-                gameState.stamina = Math.max(0, gameState.stamina - delta * 28);
-            } else {
-                gameState.stamina = Math.min(gameState.maxStamina, gameState.stamina + delta * 20);
-            }
+            if (player.isSprinting) gameState.stamina = Math.max(0, gameState.stamina - delta * 28);
+            else gameState.stamina = Math.min(gameState.maxStamina, gameState.stamina + delta * 20);
 
             const forward = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y);
             const side = new THREE.Vector3(1, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), player.rotation.y);
@@ -1056,9 +1118,7 @@
             if (keys.KeyA) moveDir.sub(side);
             moveDir.normalize();
 
-            const isMoving = moveDir.lengthSq() > 0;
-
-            if (isMoving && player.isGrounded) {
+            if (moveDir.lengthSq() > 0 && player.isGrounded) {
                 footstepTimer += delta;
                 if (footstepTimer > (player.isSprinting ? 0.28 : 0.45)) {
                     audio.playFootstep();
@@ -1076,97 +1136,178 @@
 
             player.velocity.y -= 19.6 * delta;
 
-            const nextPos = player.position.clone();
+            // Calculate proposed position
+            let nextPos = player.position.clone();
             nextPos.x += player.velocity.x * delta;
             nextPos.y += player.velocity.y * delta;
             nextPos.z += player.velocity.z * delta;
 
+            // Ground Floor Check
             if (nextPos.y <= player.height) {
                 nextPos.y = player.height;
                 player.velocity.y = 0;
                 player.isGrounded = true;
             }
 
-            player.position.copy(nextPos);
+            // --- COMPREHENSIVE SLIDING OBJECT COLLISION DETECTION ---
+            // 1. Radial Cylindrical Collisions (Trees, Boulders, Lamp posts, NPCs)
+            for (let cyl of collisionCylinders) {
+                const dx = nextPos.x - cyl.x;
+                const dz = nextPos.z - cyl.z;
+                const dist = Math.hypot(dx, dz);
+                const minDist = player.radius + cyl.radius;
 
+                if (dist < minDist) {
+                    const overlap = minDist - dist;
+                    const nx = dx / (dist || 1);
+                    const nz = dz / (dist || 1);
+                    nextPos.x += nx * overlap;
+                    nextPos.z += nz * overlap;
+                }
+            }
+
+            // 2. AABB Box Collisions (Castle walls & Cottage structural walls)
+            for (let box of collisionBoxes) {
+                // Expand box by player radius for Minkowski sum collision
+                const expandedBox = box.clone().expandByScalar(player.radius);
+                if (expandedBox.containsPoint(nextPos)) {
+                    // Push out along shortest axis (Sliding physics)
+                    const dLeft = Math.abs(nextPos.x - expandedBox.min.x);
+                    const dRight = Math.abs(expandedBox.max.x - nextPos.x);
+                    const dBack = Math.abs(nextPos.z - expandedBox.min.z);
+                    const dFront = Math.abs(expandedBox.max.z - nextPos.z);
+
+                    const minOverlap = Math.min(dLeft, dRight, dBack, dFront);
+                    if (minOverlap === dLeft) nextPos.x = expandedBox.min.x;
+                    else if (minOverlap === dRight) nextPos.x = expandedBox.max.x;
+                    else if (minOverlap === dBack) nextPos.z = expandedBox.min.z;
+                    else if (minOverlap === dFront) nextPos.z = expandedBox.max.z;
+                }
+            }
+
+            player.position.copy(nextPos);
             camera.position.copy(player.position);
             camera.rotation.copy(player.rotation);
 
-            // --- REALISTIC SLOW HEAVY ATTACK DYNAMICS & WRIST-PIVOT KINEMATICS ---
+            // Update Animated Town Doors
+            townDoors.forEach(door => {
+                door.currentAngle += (door.targetAngle - door.currentAngle) * delta * 8.0;
+                door.pivot.rotation.y = door.currentAngle;
+            });
+
+            // Interaction Prompt UI Check
+            let nearInteractable = false;
+            let promptText = "";
+
+            for (let door of townDoors) {
+                if (player.position.distanceTo(door.position) < 2.6) {
+                    nearInteractable = true;
+                    promptText = door.isOpen ? "Close Door" : "Open Door";
+                    break;
+                }
+            }
+
+            if (!nearInteractable && player.position.distanceTo(npcs[0].position) < 4.0) {
+                nearInteractable = true;
+                promptText = "Talk to Elder Bran";
+            }
+
+            const prompt = document.getElementById('interaction-prompt');
+            if (nearInteractable) {
+                document.getElementById('interact-text').textContent = promptText;
+                prompt.classList.remove('hidden');
+            } else prompt.classList.add('hidden');
+
+            // Weapon Anim Updates
             if (player.isAttacking) {
-                // Extended duration for heavy weighted swings
-                player.attackProgress += delta * 2.2;
+                player.attackProgress += delta * 2.4;
                 const p = player.attackProgress;
                 const atk = comboAttacks[player.comboIndex];
 
-                if (p < 0.28) {
-                    // Wind-up Telegraph Phase
-                    const t = p / 0.28;
-                    const easeT = t * t;
-                    player.targetPos.lerpVectors(player.idlePos, atk.startPos, easeT);
-                    player.targetRot.set(
-                        player.idleRot.x + (atk.startRot.x - player.idleRot.x) * easeT,
-                        player.idleRot.y + (atk.startRot.y - player.idleRot.y) * easeT,
-                        player.idleRot.z + (atk.startRot.z - player.idleRot.z) * easeT
-                    );
-                } else if (p < 0.72) {
-                    // Heavy Sweeping Arc Phase
-                    const t = (p - 0.28) / 0.44;
-                    // Smooth Step Quintic Ease for Heavy Inertia
-                    const easeT = t * t * t * (t * (6 * t - 15) + 10);
-                    player.targetPos.lerpVectors(atk.startPos, atk.peakPos, easeT);
-                    player.targetRot.set(
-                        atk.startRot.x + (atk.peakRot.x - atk.startRot.x) * easeT,
-                        atk.startRot.y + (atk.peakRot.y - atk.startRot.y) * easeT,
-                        atk.startRot.z + (atk.peakRot.z - atk.startRot.z) * easeT
-                    );
+                if (p < 0.3) {
+                    const t = p / 0.3;
+                    player.targetPos.lerpVectors(player.idlePos, atk.startPos, t);
+                } else if (p < 0.75) {
+                    const t = (p - 0.3) / 0.45;
+                    player.targetPos.lerpVectors(atk.startPos, atk.peakPos, t);
                 } else if (p < 1.0) {
-                    // Controlled Recovery Back to Idle
-                    const t = (p - 0.72) / 0.28;
-                    const easeT = 1 - Math.pow(1 - t, 2);
-                    player.targetPos.lerpVectors(atk.peakPos, player.idlePos, easeT);
-                    player.targetRot.set(
-                        atk.peakRot.x + (player.idleRot.x - atk.peakRot.x) * easeT,
-                        atk.peakRot.y + (player.idleRot.y - atk.peakRot.y) * easeT,
-                        atk.peakRot.z + (player.idleRot.z - atk.peakRot.z) * easeT
-                    );
+                    const t = (p - 0.75) / 0.25;
+                    player.targetPos.lerpVectors(atk.peakPos, player.idlePos, t);
                 } else {
-                    // Attack Complete -> Next Non-Linear Combo Transition
                     player.isAttacking = false;
-                    player.attackProgress = 0;
                     player.comboIndex = (player.comboIndex + 1) % comboAttacks.length;
-
-                    if (player.queuedAttack) {
-                        player.queuedAttack = false;
-                        performAttack();
-                    }
                 }
             } else if (player.isBlocking) {
-                // High Diagonal Defensive Parry Stance
                 player.targetPos.set(0.04, -0.16, -0.32);
                 player.targetRot.set(0.55, -0.85, 0.95);
             } else {
-                // Natural Idle & Movement Sway
                 const time = clock.getElapsedTime();
-                const bobX = isMoving ? Math.sin(time * 8) * 0.025 : Math.sin(time * 2) * 0.008;
-                const bobY = isMoving ? Math.cos(time * 16) * 0.02 : Math.cos(time * 3) * 0.006;
-
-                player.targetPos.copy(player.idlePos).add(new THREE.Vector3(bobX, bobY, 0));
+                player.targetPos.copy(player.idlePos).add(new THREE.Vector3(Math.sin(time * 2) * 0.008, Math.cos(time * 3) * 0.006, 0));
                 player.targetRot.copy(player.idleRot);
             }
 
-            // Smooth Interpolation to Target Frame
             player.currentPos.lerp(player.targetPos, delta * 14.0);
             player.wristPivot.position.copy(player.currentPos);
+        }
 
-            player.wristPivot.rotation.x += (player.targetRot.x - player.wristPivot.rotation.x) * delta * 14.0;
-            player.wristPivot.rotation.y += (player.targetRot.y - player.wristPivot.rotation.y) * delta * 14.0;
-            player.wristPivot.rotation.z += (player.targetRot.z - player.wristPivot.rotation.z) * delta * 14.0;
+        function updateDayNightCycle(delta) {
+            if (!gameState.started) return;
 
-            // Prompt state
-            const prompt = document.getElementById('interaction-prompt');
-            if (player.position.distanceTo(npcs[0].position) < 4.0) prompt.classList.remove('hidden');
-            else prompt.classList.add('hidden');
+            gameState.timeOfDay = (gameState.timeOfDay + delta / gameState.dayDuration) % 1.0;
+            const t = gameState.timeOfDay;
+
+            // Celestial Angle Math
+            const sunAngle = t * Math.PI * 2 - Math.PI / 2;
+            const moonAngle = sunAngle + Math.PI;
+
+            sunLight.position.set(Math.cos(sunAngle) * 120, Math.sin(sunAngle) * 120, -30);
+            moonLight.position.set(Math.cos(moonAngle) * 120, Math.sin(moonAngle) * 120, -30);
+
+            const sunY = Math.sin(sunAngle);
+
+            // Sky and Fog Color Transitions
+            let skyColor, fogColor, nightFactor = 0;
+
+            if (sunY > 0.2) {
+                // Day
+                skyColor = new THREE.Color(0x38bdf8);
+                fogColor = skyColor;
+                sunLight.intensity = 1.4;
+                moonLight.intensity = 0.0;
+            } else if (sunY > -0.2) {
+                // Dawn / Sunset Twilight
+                skyColor = new THREE.Color(0xf97316);
+                fogColor = new THREE.Color(0xa855f7);
+                sunLight.intensity = 0.6;
+                moonLight.intensity = 0.2;
+            } else {
+                // Deep Night
+                skyColor = new THREE.Color(0x050515);
+                fogColor = skyColor;
+                sunLight.intensity = 0.0;
+                moonLight.intensity = 0.45;
+                nightFactor = 1.0;
+            }
+
+            scene.background = skyColor;
+            scene.fog.color = fogColor;
+            starFieldMesh.material.opacity = nightFactor * 0.9;
+
+            // Street Lanterns and Fire Light Dynamic Night Flickering
+            streetLanterns.forEach(lamp => {
+                lamp.intensity = (nightFactor > 0.1 ? 2.5 : 0.2) + Math.sin(clock.getElapsedTime() * 12) * 0.2;
+            });
+
+            audio.updateNightAmbience(nightFactor);
+
+            // Update UI Clock
+            const totalHours = Math.floor(t * 24);
+            const displayHour = totalHours % 12 === 0 ? 12 : totalHours % 12;
+            const displayMin = Math.floor((t * 24 % 1) * 60).toString().padStart(2, '0');
+            const ampm = totalHours >= 12 ? 'PM' : 'AM';
+
+            document.getElementById('clock-display').textContent = `${displayHour}:${displayMin} ${ampm}`;
+            document.getElementById('time-icon').textContent = nightFactor > 0.5 ? '🌙' : '☀️';
         }
 
         function updateCollectibles(delta) {
@@ -1194,9 +1335,8 @@
                     enemy.mesh.position.addScaledVector(dir, enemy.speed * delta);
 
                     if (dist < 1.8 && clock.getElapsedTime() - enemy.lastAttack > 1.5) {
-                        if (player.isBlocking) {
-                            audio.playParry();
-                        } else {
+                        if (player.isBlocking) audio.playParry();
+                        else {
                             gameState.health = Math.max(0, gameState.health - 15);
                             audio.playHit();
                             updateHUD();
@@ -1224,21 +1364,21 @@
 
         function animate() {
             requestAnimationFrame(animate);
-
             const delta = clock.getDelta();
 
             if (gameState.started) {
-                updatePlayer(delta);
+                updatePlayerPhysics(delta);
+                updateDayNightCycle(delta);
                 updateCollectibles(delta);
                 updateEnemies(delta);
                 updateHUD();
             }
 
-            // Render 3D Scene into Offscreen Low-Res Target ($384 \times 216$)
+            // Render Offscreen Low-Res Texture
             renderer.setRenderTarget(offscreenTarget);
             renderer.render(scene, camera);
 
-            // Blit Low-Res Texture onto Fullscreen Quad with Nearest-Neighbor Scaling
+            // Upscale with Nearest-Neighbor
             renderer.setRenderTarget(null);
             renderer.render(virtualScene, new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1));
         }
